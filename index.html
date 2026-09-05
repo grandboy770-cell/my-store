@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>My Store</title>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
@@ -25,6 +29,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 20px;
     }
 
     .logo {
@@ -61,6 +66,13 @@
       padding: 13px 25px;
       border-radius: 6px;
       text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .btn:hover {
+      opacity: .85;
     }
 
     .products {
@@ -102,6 +114,128 @@
     .price {
       font-weight: bold;
       margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .stock {
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .loading,
+    .empty,
+    .error {
+      text-align: center;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+    }
+
+    .error {
+      color: #b00020;
+    }
+
+    /* Product Detail */
+
+    #productDetail {
+      display: none;
+      padding: 45px 6%;
+    }
+
+    .detail-box {
+      background: white;
+      max-width: 1000px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .detail-grid img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      background: #f5f5f5;
+      border-radius: 10px;
+    }
+
+    .detail-info h1 {
+      margin-bottom: 15px;
+    }
+
+    .detail-price {
+      font-size: 25px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .description {
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      white-space: pre-wrap;
+    }
+
+    /* Order Form */
+
+    .order-form {
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 1px solid #ddd;
+    }
+
+    .order-form h2 {
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .form-group textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .success {
+      display: none;
+      background: #e8f7e8;
+      color: #176b17;
+      padding: 15px;
+      border-radius: 7px;
+      margin-top: 15px;
+    }
+
+    .form-error {
+      display: none;
+      background: #ffe9e9;
+      color: #a00000;
+      padding: 15px;
+      border-radius: 7px;
+      margin-top: 15px;
     }
 
     footer {
@@ -121,6 +255,29 @@
       margin: 0 8px;
       text-decoration: none;
     }
+
+    .back-btn {
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      nav a {
+        margin: 0 7px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -130,81 +287,554 @@
   <div class="logo">My Store</div>
 
   <nav>
-    <a href="#">Home</a>
+    <a href="./">Home</a>
     <a href="#products">Products</a>
     <a href="#about">About</a>
     <a href="#contact">Contact</a>
   </nav>
 </header>
 
-<section class="hero">
+<!-- HOME -->
+
+<section class="hero" id="home">
   <h1>Welcome to My Store</h1>
   <p>Discover quality products at great prices.</p>
   <a href="#products" class="btn">Shop Now</a>
 </section>
 
+<!-- PRODUCTS -->
+
 <section class="products" id="products">
   <h2>Latest Products</h2>
 
-  <div class="product-grid">
-
-    <div class="product">
-      <img src="https://via.placeholder.com/500x500?text=Product+1" alt="Product 1">
-
-      <div class="product-info">
-        <h3>Product 1</h3>
-        <div class="price">Rs. 1,500</div>
-        <a href="#" class="btn">View Product</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <img src="https://via.placeholder.com/500x500?text=Product+2" alt="Product 2">
-
-      <div class="product-info">
-        <h3>Product 2</h3>
-        <div class="price">Rs. 2,000</div>
-        <a href="#" class="btn">View Product</a>
-      </div>
-    </div>
-
-    <div class="product">
-      <img src="https://via.placeholder.com/500x500?text=Product+3" alt="Product 3">
-
-      <div class="product-info">
-        <h3>Product 3</h3>
-        <div class="price">Rs. 999</div>
-        <a href="#" class="btn">View Product</a>
-      </div>
-    </div>
-
+  <div id="productGrid" class="product-grid">
+    <div class="loading">Loading products...</div>
   </div>
 </section>
 
+<!-- PRODUCT DETAIL -->
+
+<section id="productDetail">
+
+  <div class="detail-box">
+
+    <a href="./#products" class="btn back-btn">← Back to Products</a>
+
+    <div id="detailContent"></div>
+
+  </div>
+
+</section>
+
+<!-- ABOUT -->
+
 <section class="products" id="about">
   <h2>About Us</h2>
+
   <p>
     Welcome to our online store. We offer different products
     and aim to provide a simple and reliable shopping experience.
   </p>
 </section>
 
+<!-- CONTACT -->
+
 <section class="products" id="contact">
   <h2>Contact Us</h2>
+
   <p>Email: your@email.com</p>
   <p>Phone: 0300-0000000</p>
 </section>
 
 <footer>
+
   <p>© 2026 My Store. All Rights Reserved.</p>
 
   <div class="social">
-    <a href="#">Facebook</a>
-    <a href="#">Instagram</a>
-    <a href="#">TikTok</a>
-    <a href="#">YouTube</a>
+    <a href="#" target="_blank">Facebook</a>
+    <a href="#" target="_blank">Instagram</a>
+    <a href="#" target="_blank">TikTok</a>
+    <a href="#" target="_blank">YouTube</a>
   </div>
+
 </footer>
+
+
+<script>
+
+  /* =========================================
+     SUPABASE CONNECTION
+  ========================================= */
+
+  const SUPABASE_URL =
+    "https://qmchlafchuvldumxurbl.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
+
+  const { createClient } = supabase;
+
+  const db = createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+  /* =========================================
+     LOAD PRODUCTS
+  ========================================= */
+
+  async function loadProducts() {
+
+    const grid = document.getElementById("productGrid");
+
+    grid.innerHTML =
+      '<div class="loading">Loading products...</div>';
+
+    const { data, error } = await db
+      .from("products")
+      .select("*")
+      .eq("status", "active")
+      .order("created_at", {
+        ascending: false
+      });
+
+    if (error) {
+
+      console.error(error);
+
+      grid.innerHTML =
+        '<div class="error">Products load nahi ho rahe. Please try again.</div>';
+
+      return;
+    }
+
+    if (!data || data.length === 0) {
+
+      grid.innerHTML =
+        '<div class="empty">Abhi koi product available nahi hai.</div>';
+
+      return;
+    }
+
+    grid.innerHTML = "";
+
+    data.forEach(product => {
+
+      const card = document.createElement("div");
+
+      card.className = "product";
+
+      const image =
+        product.image_url ||
+        "https://via.placeholder.com/500x500?text=Product";
+
+      const stockText =
+        product.stock > 0
+          ? `Stock: ${product.stock}`
+          : "Out of Stock";
+
+      const button =
+        product.stock > 0
+          ? `<a class="btn" href="?product=${encodeURIComponent(product.slug)}">
+               View Product
+             </a>`
+          : `<span class="btn" style="opacity:.5;cursor:not-allowed;">
+               Out of Stock
+             </span>`;
+
+      card.innerHTML = `
+
+        <img
+          src="${image}"
+          alt="${escapeHtml(product.name)}"
+          onerror="this.src='https://via.placeholder.com/500x500?text=Product'"
+        >
+
+        <div class="product-info">
+
+          <h3>${escapeHtml(product.name)}</h3>
+
+          <div class="price">
+            Rs. ${Number(product.price).toLocaleString()}
+          </div>
+
+          <div class="stock">
+            ${stockText}
+          </div>
+
+          ${button}
+
+        </div>
+      `;
+
+      grid.appendChild(card);
+
+    });
+
+  }
+
+
+  /* =========================================
+     LOAD SINGLE PRODUCT
+  ========================================= */
+
+  async function loadProductDetail(slug) {
+
+    const productSection =
+      document.getElementById("productDetail");
+
+    const content =
+      document.getElementById("detailContent");
+
+    document.getElementById("home").style.display = "none";
+    document.getElementById("products").style.display = "none";
+    document.getElementById("about").style.display = "none";
+    document.getElementById("contact").style.display = "none";
+
+    productSection.style.display = "block";
+
+    content.innerHTML =
+      '<div class="loading">Loading product...</div>';
+
+    const { data, error } = await db
+      .from("products")
+      .select("*")
+      .eq("slug", slug)
+      .eq("status", "active")
+      .single();
+
+    if (error || !data) {
+
+      content.innerHTML =
+        '<div class="error">Product nahi mila.</div>';
+
+      return;
+    }
+
+    const product = data;
+
+    const image =
+      product.image_url ||
+      "https://via.placeholder.com/600x600?text=Product";
+
+    content.innerHTML = `
+
+      <div class="detail-grid">
+
+        <div>
+          <img
+            src="${image}"
+            alt="${escapeHtml(product.name)}"
+            onerror="this.src='https://via.placeholder.com/600x600?text=Product'"
+          >
+        </div>
+
+        <div class="detail-info">
+
+          <h1>${escapeHtml(product.name)}</h1>
+
+          <div class="detail-price">
+            Rs. ${Number(product.price).toLocaleString()}
+          </div>
+
+          <div class="stock">
+            ${
+              product.stock > 0
+                ? `Available Stock: ${product.stock}`
+                : "Out of Stock"
+            }
+          </div>
+
+          <div class="description">
+            ${escapeHtml(product.description || "No description available.")}
+          </div>
+
+          ${
+            product.stock > 0
+              ? createOrderForm(product)
+              : `<p><strong>This product is currently out of stock.</strong></p>`
+          }
+
+        </div>
+
+      </div>
+    `;
+
+    if (product.stock > 0) {
+      setupOrderForm(product);
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+
+  /* =========================================
+     ORDER FORM HTML
+  ========================================= */
+
+  function createOrderForm(product) {
+
+    return `
+
+      <div class="order-form">
+
+        <h2>Place Your Order</h2>
+
+        <form id="orderForm">
+
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input
+              type="text"
+              id="customerName"
+              required
+              placeholder="Enter your full name"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number *</label>
+            <input
+              type="tel"
+              id="phone"
+              required
+              placeholder="03XXXXXXXXX"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Complete Address *</label>
+            <textarea
+              id="address"
+              required
+              placeholder="House, street, area..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>City *</label>
+            <input
+              type="text"
+              id="city"
+              required
+              placeholder="Your city"
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Quantity *</label>
+
+            <input
+              type="number"
+              id="quantity"
+              min="1"
+              max="${product.stock}"
+              value="1"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label>Note (Optional)</label>
+
+            <textarea
+              id="note"
+              placeholder="Any special instructions..."
+            ></textarea>
+          </div>
+
+          <button
+            type="submit"
+            class="btn"
+            id="orderButton"
+          >
+            Place Order
+          </button>
+
+          <div id="successMessage" class="success">
+            ✅ Your order has been placed successfully!
+          </div>
+
+          <div id="errorMessage" class="form-error"></div>
+
+        </form>
+
+      </div>
+
+    `;
+  }
+
+
+  /* =========================================
+     SUBMIT ORDER
+  ========================================= */
+
+  function setupOrderForm(product) {
+
+    const form =
+      document.getElementById("orderForm");
+
+    if (!form) return;
+
+    form.addEventListener("submit", async function(e) {
+
+      e.preventDefault();
+
+      const button =
+        document.getElementById("orderButton");
+
+      const success =
+        document.getElementById("successMessage");
+
+      const errorBox =
+        document.getElementById("errorMessage");
+
+      success.style.display = "none";
+      errorBox.style.display = "none";
+
+      const customerName =
+        document.getElementById("customerName").value.trim();
+
+      const phone =
+        document.getElementById("phone").value.trim();
+
+      const address =
+        document.getElementById("address").value.trim();
+
+      const city =
+        document.getElementById("city").value.trim();
+
+      const quantity =
+        Number(document.getElementById("quantity").value);
+
+      const note =
+        document.getElementById("note").value.trim();
+
+
+      if (quantity < 1 || quantity > product.stock) {
+
+        errorBox.textContent =
+          "Please enter a valid quantity.";
+
+        errorBox.style.display = "block";
+
+        return;
+      }
+
+
+      button.disabled = true;
+      button.textContent = "Placing Order...";
+
+
+      const { error } = await db
+        .from("orders")
+        .insert([{
+
+          product_id: product.id,
+
+          customer_name: customerName,
+
+          phone: phone,
+
+          address: address,
+
+          city: city,
+
+          quantity: quantity,
+
+          note: note,
+
+          status: "pending"
+
+        }]);
+
+
+      if (error) {
+
+        console.error(error);
+
+        errorBox.textContent =
+          "Order place nahi ho saka. Please try again.";
+
+        errorBox.style.display = "block";
+
+        button.disabled = false;
+        button.textContent = "Place Order";
+
+        return;
+      }
+
+
+      success.innerHTML =
+        "✅ Order successfully placed! We will contact you soon.";
+
+      success.style.display = "block";
+
+      form.reset();
+
+      document.getElementById("quantity").value = 1;
+
+      button.disabled = false;
+      button.textContent = "Place Order";
+
+    });
+
+  }
+
+
+  /* =========================================
+     SECURITY: HTML ESCAPE
+  ========================================= */
+
+  function escapeHtml(value) {
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+  }
+
+
+  /* =========================================
+     CHECK URL FOR PRODUCT
+  ========================================= */
+
+  function checkProductUrl() {
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    const slug =
+      params.get("product");
+
+    if (slug) {
+
+      loadProductDetail(slug);
+
+    } else {
+
+      loadProducts();
+
+    }
+
+  }
+
+
+  /* =========================================
+     START
+  ========================================= */
+
+  checkProductUrl();
+
+</script>
 
 </body>
 </html>
