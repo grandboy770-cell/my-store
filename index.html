@@ -6,7 +6,6 @@
 
   <title>My Store</title>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -16,182 +15,301 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f6f6f6;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
       color: #222;
     }
+
+    /* ================= HEADER ================= */
 
     header {
       background: #111;
       color: white;
-      padding: 18px 6%;
+      padding: 16px 5%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 20px;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      box-shadow: 0 2px 12px rgba(0,0,0,.15);
     }
 
     .logo {
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 25px;
+      font-weight: 700;
+    }
+
+    nav {
+      display: flex;
+      gap: 25px;
     }
 
     nav a {
       color: white;
       text-decoration: none;
-      margin-left: 20px;
+      font-size: 15px;
     }
 
+    nav a:hover {
+      opacity: .7;
+    }
+
+    /* ================= HERO ================= */
+
     .hero {
-      padding: 70px 6%;
-      text-align: center;
       background: white;
+      text-align: center;
+      padding: 75px 20px;
     }
 
     .hero h1 {
-      font-size: 42px;
+      font-size: 44px;
       margin-bottom: 15px;
     }
 
     .hero p {
       color: #666;
-      margin-bottom: 25px;
+      font-size: 18px;
+      margin-bottom: 28px;
     }
 
     .btn {
       display: inline-block;
       background: #111;
       color: white;
-      padding: 13px 25px;
-      border-radius: 6px;
-      text-decoration: none;
       border: none;
+      border-radius: 7px;
+      padding: 12px 20px;
+      text-decoration: none;
       cursor: pointer;
-      font-size: 15px;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .btn:hover {
-      opacity: .85;
+      opacity: .82;
     }
+
+    /* ================= SHOP ================= */
 
     .products {
-      padding: 45px 6%;
+      max-width: 1250px;
+      margin: auto;
+      padding: 55px 20px;
     }
 
-    .products h2 {
-      margin-bottom: 25px;
+    .section-title {
+      text-align: center;
+      margin-bottom: 30px;
     }
+
+    .section-title h2 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .section-title p {
+      color: #777;
+    }
+
+    /* SEARCH */
+
+    .shop-tools {
+      display: flex;
+      gap: 12px;
+      max-width: 850px;
+      margin: 0 auto 35px;
+    }
+
+    .search-box {
+      flex: 1;
+    }
+
+    .search-box input,
+    .category-select {
+      width: 100%;
+      height: 46px;
+      padding: 0 14px;
+      border: 1px solid #ddd;
+      border-radius: 7px;
+      background: white;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .search-box input:focus,
+    .category-select:focus {
+      border-color: #111;
+    }
+
+    .category-box {
+      width: 210px;
+    }
+
+    /* ================= PRODUCT GRID ================= */
 
     .product-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
+
+      /* IMPORTANT:
+         4 products on large screens
+      */
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 22px;
     }
 
     .product {
       background: white;
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      border: 1px solid #e8e8e8;
+      box-shadow: 0 3px 12px rgba(0,0,0,.06);
+      transition: .2s ease;
+      min-width: 0;
     }
 
-    .product img {
+    .product:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 22px rgba(0,0,0,.12);
+    }
+
+    .product-image {
       width: 100%;
-      height: 220px;
+      height: 230px;
       object-fit: cover;
+      display: block;
       background: #eee;
     }
 
     .product-info {
-      padding: 18px;
+      padding: 16px;
     }
 
-    .product-info h3 {
-      margin-bottom: 8px;
+    .category-label {
+      display: inline-block;
+      background: #f0f0f0;
+      color: #555;
+      padding: 5px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+
+    .product-name {
+      font-size: 17px;
+      line-height: 1.3;
+      margin-bottom: 9px;
+
+      /* Long name ko control karega */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .price {
-      font-weight: bold;
-      margin-bottom: 15px;
       font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 7px;
     }
 
     .stock {
-      color: #555;
-      font-size: 14px;
-      margin-bottom: 15px;
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 14px;
     }
+
+    .product .btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ================= LOADING ================= */
 
     .loading,
     .empty,
     .error {
-      text-align: center;
-      padding: 30px;
       background: white;
+      padding: 40px;
+      text-align: center;
       border-radius: 10px;
+      grid-column: 1 / -1;
     }
 
     .error {
-      color: #b00020;
+      color: #a00000;
     }
 
-    /* Product Detail */
+    /* ================= PRODUCT DETAIL ================= */
 
     #productDetail {
       display: none;
-      padding: 45px 6%;
+      max-width: 1100px;
+      margin: auto;
+      padding: 45px 20px;
     }
 
     .detail-box {
       background: white;
-      max-width: 1000px;
-      margin: auto;
-      padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      padding: 25px;
+      box-shadow: 0 3px 15px rgba(0,0,0,.08);
+    }
+
+    .back-btn {
+      margin-bottom: 25px;
     }
 
     .detail-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 30px;
+      gap: 40px;
     }
 
-    .detail-grid img {
+    .detail-image {
       width: 100%;
-      max-height: 500px;
+      height: 500px;
       object-fit: contain;
-      background: #f5f5f5;
+      background: #f4f4f4;
       border-radius: 10px;
     }
 
     .detail-info h1 {
-      margin-bottom: 15px;
+      font-size: 32px;
+      margin-bottom: 12px;
     }
 
     .detail-price {
-      font-size: 25px;
-      font-weight: bold;
-      margin-bottom: 15px;
+      font-size: 27px;
+      font-weight: 700;
+      margin: 15px 0;
     }
 
-    .description {
-      color: #555;
+    .detail-description {
+      color: #666;
       line-height: 1.7;
-      margin-bottom: 20px;
       white-space: pre-wrap;
+      margin-bottom: 20px;
     }
 
-    /* Order Form */
+    /* ================= ORDER FORM ================= */
 
     .order-form {
+      border-top: 1px solid #eee;
       margin-top: 25px;
       padding-top: 25px;
-      border-top: 1px solid #ddd;
     }
 
     .order-form h2 {
+      font-size: 22px;
       margin-bottom: 20px;
     }
 
@@ -201,49 +319,84 @@
 
     .form-group label {
       display: block;
+      font-weight: 600;
+      font-size: 14px;
       margin-bottom: 6px;
-      font-weight: bold;
     }
 
     .form-group input,
-    .form-group textarea,
-    .form-group select {
+    .form-group textarea {
       width: 100%;
       padding: 12px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
+      border-radius: 7px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: #111;
     }
 
     .form-group textarea {
-      min-height: 90px;
+      min-height: 85px;
       resize: vertical;
+    }
+
+    .order-form .btn {
+      width: 100%;
+      margin-top: 5px;
     }
 
     .success {
       display: none;
       background: #e8f7e8;
       color: #176b17;
-      padding: 15px;
+      padding: 14px;
       border-radius: 7px;
       margin-top: 15px;
     }
 
     .form-error {
       display: none;
-      background: #ffe9e9;
+      background: #ffe8e8;
       color: #a00000;
-      padding: 15px;
+      padding: 14px;
       border-radius: 7px;
       margin-top: 15px;
     }
 
+    /* ================= ABOUT ================= */
+
+    .info-section {
+      background: white;
+      padding: 60px 20px;
+    }
+
+    .info-inner {
+      max-width: 1000px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .info-inner h2 {
+      font-size: 30px;
+      margin-bottom: 15px;
+    }
+
+    .info-inner p {
+      color: #666;
+      line-height: 1.8;
+    }
+
+    /* ================= FOOTER ================= */
+
     footer {
-      margin-top: 40px;
-      padding: 30px 6%;
       background: #111;
       color: white;
       text-align: center;
+      padding: 35px 20px;
     }
 
     .social {
@@ -252,73 +405,283 @@
 
     .social a {
       color: white;
-      margin: 0 8px;
       text-decoration: none;
+      margin: 0 8px;
+      font-size: 14px;
     }
 
-    .back-btn {
-      margin-bottom: 20px;
-    }
+    /* ================= RESPONSIVE ================= */
 
-    @media (max-width: 700px) {
-      header {
-        flex-direction: column;
-        text-align: center;
+    /* Tablet */
+    @media (max-width: 1000px) {
+
+      .product-grid {
+        grid-template-columns:
+          repeat(3, minmax(0, 1fr));
       }
 
-      nav a {
-        margin: 0 7px;
+    }
+
+    /* Small tablet */
+    @media (max-width: 750px) {
+
+      header {
+        padding: 15px 20px;
+      }
+
+      nav {
+        gap: 12px;
       }
 
       .hero h1 {
-        font-size: 32px;
+        font-size: 35px;
+      }
+
+      .product-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
       }
 
       .detail-grid {
         grid-template-columns: 1fr;
       }
+
+      .detail-image {
+        height: 400px;
+      }
+
+    }
+
+    /* Mobile */
+    @media (max-width: 520px) {
+
+      header {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      nav {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .hero {
+        padding: 55px 20px;
+      }
+
+      .hero h1 {
+        font-size: 30px;
+      }
+
+      .hero p {
+        font-size: 15px;
+      }
+
+      .products {
+        padding: 40px 14px;
+      }
+
+      .section-title h2 {
+        font-size: 27px;
+      }
+
+      .shop-tools {
+        display: block;
+      }
+
+      .search-box {
+        margin-bottom: 10px;
+      }
+
+      .category-box {
+        width: 100%;
+      }
+
+      /* Mobile par 2 products */
+      .product-grid {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .product-image {
+        height: 165px;
+      }
+
+      .product-info {
+        padding: 12px;
+      }
+
+      .product-name {
+        font-size: 14px;
+      }
+
+      .price {
+        font-size: 15px;
+      }
+
+      .stock {
+        font-size: 11px;
+      }
+
+      .product .btn {
+        padding: 10px 5px;
+        font-size: 12px;
+      }
+
+      .detail-box {
+        padding: 15px;
+      }
+
+      .detail-image {
+        height: 300px;
+      }
+
+      .detail-info h1 {
+        font-size: 25px;
+      }
+
     }
   </style>
 </head>
 
 <body>
 
+
+<!-- ================= HEADER ================= -->
+
 <header>
-  <div class="logo">My Store</div>
+
+  <div class="logo">
+    My Store
+  </div>
 
   <nav>
-    <a href="./">Home</a>
-    <a href="#products">Products</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
+
+    <a href="./">
+      Home
+    </a>
+
+    <a href="#products">
+      Products
+    </a>
+
+    <a href="#about">
+      About
+    </a>
+
+    <a href="#contact">
+      Contact
+    </a>
+
   </nav>
+
 </header>
 
-<!-- HOME -->
+
+<!-- ================= HERO ================= -->
 
 <section class="hero" id="home">
-  <h1>Welcome to My Store</h1>
-  <p>Discover quality products at great prices.</p>
-  <a href="#products" class="btn">Shop Now</a>
+
+  <h1>
+    Welcome to My Store
+  </h1>
+
+  <p>
+    Discover quality products at great prices.
+  </p>
+
+  <a
+    href="#products"
+    class="btn"
+  >
+    Shop Now
+  </a>
+
 </section>
 
-<!-- PRODUCTS -->
 
-<section class="products" id="products">
-  <h2>Latest Products</h2>
+<!-- ================= PRODUCTS ================= -->
 
-  <div id="productGrid" class="product-grid">
-    <div class="loading">Loading products...</div>
+<section
+  class="products"
+  id="products"
+>
+
+  <div class="section-title">
+
+    <h2>
+      Latest Products
+    </h2>
+
+    <p>
+      Find the products you are looking for.
+    </p>
+
   </div>
+
+
+  <!-- SEARCH + CATEGORY -->
+
+  <div class="shop-tools">
+
+    <div class="search-box">
+
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="🔎 Search products..."
+      >
+
+    </div>
+
+
+    <div class="category-box">
+
+      <select
+        id="categoryFilter"
+        class="category-select"
+      >
+
+        <option value="all">
+          All Categories
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+
+  <!-- PRODUCT GRID -->
+
+  <div
+    id="productGrid"
+    class="product-grid"
+  >
+
+    <div class="loading">
+      Loading products...
+    </div>
+
+  </div>
+
 </section>
 
-<!-- PRODUCT DETAIL -->
+
+<!-- ================= PRODUCT DETAIL ================= -->
 
 <section id="productDetail">
 
   <div class="detail-box">
 
-    <a href="./#products" class="btn back-btn">← Back to Products</a>
+    <a
+      href="./#products"
+      class="btn back-btn"
+    >
+      ← Back to Products
+    </a>
 
     <div id="detailContent"></div>
 
@@ -326,35 +689,83 @@
 
 </section>
 
-<!-- ABOUT -->
 
-<section class="products" id="about">
-  <h2>About Us</h2>
+<!-- ================= ABOUT ================= -->
 
-  <p>
-    Welcome to our online store. We offer different products
-    and aim to provide a simple and reliable shopping experience.
-  </p>
+<section
+  class="info-section"
+  id="about"
+>
+
+  <div class="info-inner">
+
+    <h2>
+      About Us
+    </h2>
+
+    <p>
+      Welcome to our online store. We offer different
+      products and aim to provide a simple, reliable and
+      convenient shopping experience.
+    </p>
+
+  </div>
+
 </section>
 
-<!-- CONTACT -->
 
-<section class="products" id="contact">
-  <h2>Contact Us</h2>
+<!-- ================= CONTACT ================= -->
 
-  <p>Email: your@email.com</p>
-  <p>Phone: 0300-0000000</p>
+<section
+  class="info-section"
+  id="contact"
+>
+
+  <div class="info-inner">
+
+    <h2>
+      Contact Us
+    </h2>
+
+    <p>
+      Email: your@email.com
+    </p>
+
+    <p>
+      Phone: 0300-0000000
+    </p>
+
+  </div>
+
 </section>
+
+
+<!-- ================= FOOTER ================= -->
 
 <footer>
 
-  <p>© 2026 My Store. All Rights Reserved.</p>
+  <p>
+    © 2026 My Store. All Rights Reserved.
+  </p>
 
   <div class="social">
-    <a href="#" target="_blank">Facebook</a>
-    <a href="#" target="_blank">Instagram</a>
-    <a href="#" target="_blank">TikTok</a>
-    <a href="#" target="_blank">YouTube</a>
+
+    <a href="#" target="_blank">
+      Facebook
+    </a>
+
+    <a href="#" target="_blank">
+      Instagram
+    </a>
+
+    <a href="#" target="_blank">
+      TikTok
+    </a>
+
+    <a href="#" target="_blank">
+      YouTube
+    </a>
+
   </div>
 
 </footer>
@@ -362,36 +773,46 @@
 
 <script>
 
-  /* =========================================
-     SUPABASE CONNECTION
-  ========================================= */
+/* ==========================================
+   SUPABASE CONNECTION
+========================================== */
 
-  const SUPABASE_URL =
-    "https://qmchlafchuvldumxurbl.supabase.co";
+const SUPABASE_URL =
+  "https://qmchlafchuvldumxurbl.supabase.co";
 
-  const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
 
-  const { createClient } = supabase;
+const { createClient } = supabase;
 
-  const db = createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+const db = createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
 
-  /* =========================================
-     LOAD PRODUCTS
-  ========================================= */
+/* ==========================================
+   GLOBAL PRODUCTS
+========================================== */
 
-  async function loadProducts() {
+let allProducts = [];
 
-    const grid = document.getElementById("productGrid");
 
-    grid.innerHTML =
-      '<div class="loading">Loading products...</div>';
+/* ==========================================
+   LOAD PRODUCTS
+========================================== */
 
-    const { data, error } = await db
+async function loadProducts() {
+
+  const grid =
+    document.getElementById("productGrid");
+
+  grid.innerHTML =
+    '<div class="loading">Loading products...</div>';
+
+
+  const { data, error } =
+    await db
       .from("products")
       .select("*")
       .eq("status", "active")
@@ -399,324 +820,663 @@
         ascending: false
       });
 
-    if (error) {
 
-      console.error(error);
+  if (error) {
 
-      grid.innerHTML =
-        '<div class="error">Products load nahi ho rahe. Please try again.</div>';
+    console.error(error);
 
-      return;
-    }
+    grid.innerHTML =
+      `<div class="error">
+        Products load nahi ho rahe.
+        <br><br>
+        Please try again.
+      </div>`;
 
-    if (!data || data.length === 0) {
-
-      grid.innerHTML =
-        '<div class="empty">Abhi koi product available nahi hai.</div>';
-
-      return;
-    }
-
-    grid.innerHTML = "";
-
-    data.forEach(product => {
-
-      const card = document.createElement("div");
-
-      card.className = "product";
-
-      const image =
-        product.image_url ||
-        "https://via.placeholder.com/500x500?text=Product";
-
-      const stockText =
-        product.stock > 0
-          ? `Stock: ${product.stock}`
-          : "Out of Stock";
-
-      const button =
-        product.stock > 0
-          ? `<a class="btn" href="?product=${encodeURIComponent(product.slug)}">
-               View Product
-             </a>`
-          : `<span class="btn" style="opacity:.5;cursor:not-allowed;">
-               Out of Stock
-             </span>`;
-
-      card.innerHTML = `
-
-        <img
-          src="${image}"
-          alt="${escapeHtml(product.name)}"
-          onerror="this.src='https://via.placeholder.com/500x500?text=Product'"
-        >
-
-        <div class="product-info">
-
-          <h3>${escapeHtml(product.name)}</h3>
-
-          <div class="price">
-            Rs. ${Number(product.price).toLocaleString()}
-          </div>
-
-          <div class="stock">
-            ${stockText}
-          </div>
-
-          ${button}
-
-        </div>
-      `;
-
-      grid.appendChild(card);
-
-    });
-
+    return;
   }
 
 
-  /* =========================================
-     LOAD SINGLE PRODUCT
-  ========================================= */
+  allProducts = data || [];
 
-  async function loadProductDetail(slug) {
 
-    const productSection =
-      document.getElementById("productDetail");
+  createCategories();
 
-    const content =
-      document.getElementById("detailContent");
 
-    document.getElementById("home").style.display = "none";
-    document.getElementById("products").style.display = "none";
-    document.getElementById("about").style.display = "none";
-    document.getElementById("contact").style.display = "none";
+  displayProducts(allProducts);
 
-    productSection.style.display = "block";
+}
 
-    content.innerHTML =
-      '<div class="loading">Loading product...</div>';
 
-    const { data, error } = await db
+/* ==========================================
+   CREATE CATEGORIES
+========================================== */
+
+function createCategories() {
+
+  const select =
+    document.getElementById("categoryFilter");
+
+
+  const categories = [];
+
+
+  allProducts.forEach(product => {
+
+    const category =
+      product.category || "General";
+
+
+    if (!categories.includes(category)) {
+
+      categories.push(category);
+
+    }
+
+  });
+
+
+  select.innerHTML =
+    '<option value="all">All Categories</option>';
+
+
+  categories
+    .sort()
+    .forEach(category => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = category;
+
+      option.textContent = category;
+
+      select.appendChild(option);
+
+    });
+
+}
+
+
+/* ==========================================
+   DISPLAY PRODUCTS
+========================================== */
+
+function displayProducts(products) {
+
+  const grid =
+    document.getElementById("productGrid");
+
+
+  if (!products || products.length === 0) {
+
+    grid.innerHTML =
+      `<div class="empty">
+        No products found.
+      </div>`;
+
+    return;
+  }
+
+
+  grid.innerHTML = "";
+
+
+  products.forEach(product => {
+
+    const card =
+      document.createElement("div");
+
+    card.className = "product";
+
+
+    const image =
+      product.image_url ||
+      "https://via.placeholder.com/600x600?text=Product";
+
+
+    const category =
+      product.category || "General";
+
+
+    const stock =
+      Number(product.stock || 0);
+
+
+    let button;
+
+
+    if (stock > 0) {
+
+      button = `
+        <a
+          class="btn"
+          href="?product=${encodeURIComponent(product.slug)}"
+        >
+          View Product
+        </a>
+      `;
+
+    } else {
+
+      button = `
+        <span
+          class="btn"
+          style="opacity:.5;cursor:not-allowed;"
+        >
+          Out of Stock
+        </span>
+      `;
+
+    }
+
+
+    card.innerHTML = `
+
+      <img
+        class="product-image"
+        src="${image}"
+        alt="${escapeHtml(product.name)}"
+        onerror="
+          this.src='https://via.placeholder.com/600x600?text=Product'
+        "
+      >
+
+      <div class="product-info">
+
+        <span class="category-label">
+          ${escapeHtml(category)}
+        </span>
+
+        <h3 class="product-name">
+          ${escapeHtml(product.name)}
+        </h3>
+
+        <div class="price">
+          Rs. ${Number(product.price || 0).toLocaleString()}
+        </div>
+
+        <div class="stock">
+          ${
+            stock > 0
+              ? `Stock: ${stock}`
+              : "Out of Stock"
+          }
+        </div>
+
+        ${button}
+
+      </div>
+
+    `;
+
+
+    grid.appendChild(card);
+
+  });
+
+}
+
+
+/* ==========================================
+   SEARCH + CATEGORY FILTER
+========================================== */
+
+function filterProducts() {
+
+  const search =
+    document
+      .getElementById("searchInput")
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  const category =
+    document
+      .getElementById("categoryFilter")
+      .value;
+
+
+  const filtered =
+    allProducts.filter(product => {
+
+      const name =
+        (product.name || "")
+          .toLowerCase();
+
+      const description =
+        (product.description || "")
+          .toLowerCase();
+
+      const productCategory =
+        product.category || "General";
+
+
+      const matchesSearch =
+        name.includes(search) ||
+        description.includes(search);
+
+
+      const matchesCategory =
+        category === "all" ||
+        productCategory === category;
+
+
+      return (
+        matchesSearch &&
+        matchesCategory
+      );
+
+    });
+
+
+  displayProducts(filtered);
+
+}
+
+
+document
+  .getElementById("searchInput")
+  .addEventListener(
+    "input",
+    filterProducts
+  );
+
+
+document
+  .getElementById("categoryFilter")
+  .addEventListener(
+    "change",
+    filterProducts
+  );
+
+
+/* ==========================================
+   PRODUCT DETAIL
+========================================== */
+
+async function loadProductDetail(slug) {
+
+  const detail =
+    document.getElementById("productDetail");
+
+  const content =
+    document.getElementById("detailContent");
+
+
+  document.getElementById("home")
+    .style.display = "none";
+
+  document.getElementById("products")
+    .style.display = "none";
+
+  document.getElementById("about")
+    .style.display = "none";
+
+  document.getElementById("contact")
+    .style.display = "none";
+
+
+  detail.style.display = "block";
+
+
+  content.innerHTML =
+    '<div class="loading">Loading product...</div>';
+
+
+  const { data, error } =
+    await db
       .from("products")
       .select("*")
       .eq("slug", slug)
       .eq("status", "active")
       .single();
 
-    if (error || !data) {
 
-      content.innerHTML =
-        '<div class="error">Product nahi mila.</div>';
+  if (error || !data) {
 
-      return;
-    }
+    content.innerHTML =
+      `<div class="error">
+        Product nahi mila.
+      </div>`;
 
-    const product = data;
+    return;
+  }
 
-    const image =
-      product.image_url ||
-      "https://via.placeholder.com/600x600?text=Product";
 
-    content.innerHTML = `
+  const product = data;
 
-      <div class="detail-grid">
 
-        <div>
-          <img
-            src="${image}"
-            alt="${escapeHtml(product.name)}"
-            onerror="this.src='https://via.placeholder.com/600x600?text=Product'"
-          >
+  const image =
+    product.image_url ||
+    "https://via.placeholder.com/600x600?text=Product";
+
+
+  const stock =
+    Number(product.stock || 0);
+
+
+  content.innerHTML = `
+
+    <div class="detail-grid">
+
+      <div>
+
+        <img
+          class="detail-image"
+          src="${image}"
+          alt="${escapeHtml(product.name)}"
+          onerror="
+            this.src='https://via.placeholder.com/600x600?text=Product'
+          "
+        >
+
+      </div>
+
+
+      <div class="detail-info">
+
+        <span class="category-label">
+          ${escapeHtml(product.category || "General")}
+        </span>
+
+
+        <h1>
+          ${escapeHtml(product.name)}
+        </h1>
+
+
+        <div class="detail-price">
+          Rs. ${Number(product.price || 0).toLocaleString()}
         </div>
 
-        <div class="detail-info">
 
-          <h1>${escapeHtml(product.name)}</h1>
-
-          <div class="detail-price">
-            Rs. ${Number(product.price).toLocaleString()}
-          </div>
-
-          <div class="stock">
-            ${
-              product.stock > 0
-                ? `Available Stock: ${product.stock}`
-                : "Out of Stock"
-            }
-          </div>
-
-          <div class="description">
-            ${escapeHtml(product.description || "No description available.")}
-          </div>
+        <div class="stock">
 
           ${
-            product.stock > 0
-              ? createOrderForm(product)
-              : `<p><strong>This product is currently out of stock.</strong></p>`
+            stock > 0
+              ? `Available Stock: ${stock}`
+              : "Out of Stock"
           }
 
         </div>
 
+
+        <div class="detail-description">
+          ${escapeHtml(
+            product.description ||
+            "No description available."
+          )}
+        </div>
+
+
+        ${
+          stock > 0
+            ? createOrderForm(product)
+            : `
+              <p>
+                <strong>
+                  This product is currently out of stock.
+                </strong>
+              </p>
+            `
+        }
+
       </div>
-    `;
 
-    if (product.stock > 0) {
-      setupOrderForm(product);
-    }
+    </div>
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
+  `;
+
+
+  if (stock > 0) {
+
+    setupOrderForm(product);
 
   }
 
 
-  /* =========================================
-     ORDER FORM HTML
-  ========================================= */
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
-  function createOrderForm(product) {
+}
 
-    return `
 
-      <div class="order-form">
+/* ==========================================
+   ORDER FORM
+========================================== */
 
-        <h2>Place Your Order</h2>
+function createOrderForm(product) {
 
-        <form id="orderForm">
+  return `
 
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input
-              type="text"
-              id="customerName"
-              required
-              placeholder="Enter your full name"
-            >
-          </div>
+    <div class="order-form">
 
-          <div class="form-group">
-            <label>Phone Number *</label>
-            <input
-              type="tel"
-              id="phone"
-              required
-              placeholder="03XXXXXXXXX"
-            >
-          </div>
+      <h2>
+        Place Your Order
+      </h2>
 
-          <div class="form-group">
-            <label>Complete Address *</label>
-            <textarea
-              id="address"
-              required
-              placeholder="House, street, area..."
-            ></textarea>
-          </div>
 
-          <div class="form-group">
-            <label>City *</label>
-            <input
-              type="text"
-              id="city"
-              required
-              placeholder="Your city"
-            >
-          </div>
+      <form id="orderForm">
 
-          <div class="form-group">
-            <label>Quantity *</label>
+        <div class="form-group">
 
-            <input
-              type="number"
-              id="quantity"
-              min="1"
-              max="${product.stock}"
-              value="1"
-              required
-            >
-          </div>
+          <label>
+            Full Name *
+          </label>
 
-          <div class="form-group">
-            <label>Note (Optional)</label>
-
-            <textarea
-              id="note"
-              placeholder="Any special instructions..."
-            ></textarea>
-          </div>
-
-          <button
-            type="submit"
-            class="btn"
-            id="orderButton"
+          <input
+            type="text"
+            id="customerName"
+            placeholder="Enter your full name"
+            required
           >
-            Place Order
-          </button>
 
-          <div id="successMessage" class="success">
-            ✅ Your order has been placed successfully!
-          </div>
-
-          <div id="errorMessage" class="form-error"></div>
-
-        </form>
-
-      </div>
-
-    `;
-  }
+        </div>
 
 
-  /* =========================================
-     SUBMIT ORDER
-  ========================================= */
+        <div class="form-group">
 
-  function setupOrderForm(product) {
+          <label>
+            Phone Number *
+          </label>
 
-    const form =
-      document.getElementById("orderForm");
+          <input
+            type="tel"
+            id="phone"
+            placeholder="03XXXXXXXXX"
+            required
+          >
 
-    if (!form) return;
+        </div>
 
-    form.addEventListener("submit", async function(e) {
+
+        <div class="form-group">
+
+          <label>
+            Complete Address *
+          </label>
+
+          <textarea
+            id="address"
+            placeholder="House number, street, area..."
+            required
+          ></textarea>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            City *
+          </label>
+
+          <input
+            type="text"
+            id="city"
+            placeholder="Your city"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Quantity *
+          </label>
+
+          <input
+            type="number"
+            id="quantity"
+            value="1"
+            min="1"
+            max="${product.stock}"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Note
+          </label>
+
+          <textarea
+            id="note"
+            placeholder="Optional note..."
+          ></textarea>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="btn"
+          id="orderButton"
+        >
+          Place Order
+        </button>
+
+
+        <div
+          id="successMessage"
+          class="success"
+        >
+          ✅ Your order has been placed successfully!
+        </div>
+
+
+        <div
+          id="errorMessage"
+          class="form-error"
+        ></div>
+
+      </form>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==========================================
+   SUBMIT ORDER
+========================================== */
+
+function setupOrderForm(product) {
+
+  const form =
+    document.getElementById("orderForm");
+
+
+  if (!form) return;
+
+
+  form.addEventListener(
+    "submit",
+    async function(e) {
 
       e.preventDefault();
 
+
       const button =
-        document.getElementById("orderButton");
+        document.getElementById(
+          "orderButton"
+        );
+
 
       const success =
-        document.getElementById("successMessage");
+        document.getElementById(
+          "successMessage"
+        );
+
 
       const errorBox =
-        document.getElementById("errorMessage");
+        document.getElementById(
+          "errorMessage"
+        );
+
 
       success.style.display = "none";
+
       errorBox.style.display = "none";
 
+
       const customerName =
-        document.getElementById("customerName").value.trim();
+        document
+          .getElementById("customerName")
+          .value
+          .trim();
+
 
       const phone =
-        document.getElementById("phone").value.trim();
+        document
+          .getElementById("phone")
+          .value
+          .trim();
+
 
       const address =
-        document.getElementById("address").value.trim();
+        document
+          .getElementById("address")
+          .value
+          .trim();
+
 
       const city =
-        document.getElementById("city").value.trim();
+        document
+          .getElementById("city")
+          .value
+          .trim();
+
 
       const quantity =
-        Number(document.getElementById("quantity").value);
+        Number(
+          document
+            .getElementById("quantity")
+            .value
+        );
+
 
       const note =
-        document.getElementById("note").value.trim();
+        document
+          .getElementById("note")
+          .value
+          .trim();
 
 
-      if (quantity < 1 || quantity > product.stock) {
+      if (
+        quantity < 1 ||
+        quantity > Number(product.stock)
+      ) {
 
         errorBox.textContent =
           "Please enter a valid quantity.";
@@ -728,43 +1488,61 @@
 
 
       button.disabled = true;
-      button.textContent = "Placing Order...";
+
+      button.textContent =
+        "Placing Order...";
 
 
-      const { error } = await db
-        .from("orders")
-        .insert([{
+      const { error } =
+        await db
+          .from("orders")
+          .insert([{
 
-          product_id: product.id,
+            product_id:
+              product.id,
 
-          customer_name: customerName,
+            customer_name:
+              customerName,
 
-          phone: phone,
+            phone:
+              phone,
 
-          address: address,
+            address:
+              address,
 
-          city: city,
+            city:
+              city,
 
-          quantity: quantity,
+            quantity:
+              quantity,
 
-          note: note,
+            note:
+              note,
 
-          status: "pending"
+            status:
+              "pending"
 
-        }]);
+          }]);
 
 
       if (error) {
 
         console.error(error);
 
+
         errorBox.textContent =
           "Order place nahi ho saka. Please try again.";
 
-        errorBox.style.display = "block";
+
+        errorBox.style.display =
+          "block";
+
 
         button.disabled = false;
-        button.textContent = "Place Order";
+
+        button.textContent =
+          "Place Order";
+
 
         return;
       }
@@ -773,66 +1551,80 @@
       success.innerHTML =
         "✅ Order successfully placed! We will contact you soon.";
 
-      success.style.display = "block";
+
+      success.style.display =
+        "block";
+
 
       form.reset();
 
-      document.getElementById("quantity").value = 1;
+
+      document.getElementById(
+        "quantity"
+      ).value = 1;
+
 
       button.disabled = false;
-      button.textContent = "Place Order";
 
-    });
-
-  }
-
-
-  /* =========================================
-     SECURITY: HTML ESCAPE
-  ========================================= */
-
-  function escapeHtml(value) {
-
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-
-  }
-
-
-  /* =========================================
-     CHECK URL FOR PRODUCT
-  ========================================= */
-
-  function checkProductUrl() {
-
-    const params =
-      new URLSearchParams(window.location.search);
-
-    const slug =
-      params.get("product");
-
-    if (slug) {
-
-      loadProductDetail(slug);
-
-    } else {
-
-      loadProducts();
+      button.textContent =
+        "Place Order";
 
     }
+  );
+
+}
+
+
+/* ==========================================
+   HTML SECURITY
+========================================== */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+/* ==========================================
+   CHECK PRODUCT URL
+========================================== */
+
+function checkProductUrl() {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const slug =
+    params.get("product");
+
+
+  if (slug) {
+
+    loadProductDetail(slug);
+
+  } else {
+
+    loadProducts();
 
   }
 
+}
 
-  /* =========================================
-     START
-  ========================================= */
 
-  checkProductUrl();
+/* ==========================================
+   START WEBSITE
+========================================== */
+
+checkProductUrl();
 
 </script>
 
