@@ -1,1246 +1,1830 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>My Store - Online Shopping Pakistan</title>
-  <meta name="description" content="Shop quality products online in Pakistan. Easy ordering and fast service.">
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-    }
-
-    body{
-      font-family:Arial,Helvetica,sans-serif;
-      background:#f6f7f9;
-      color:#111827;
-    }
-
-    a{
-      text-decoration:none;
-      color:inherit;
-    }
-
-    /* HEADER */
-    header{
-      background:#111;
-      color:white;
-      position:sticky;
-      top:0;
-      z-index:1000;
-    }
-
-    .nav{
-      max-width:1250px;
-      margin:auto;
-      padding:18px 22px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-    }
-
-    .logo{
-      font-size:26px;
-      font-weight:800;
-    }
-
-    .nav-links{
-      display:flex;
-      gap:28px;
-      align-items:center;
-    }
-
-    .nav-links a{
-      color:#fff;
-      font-size:15px;
-      font-weight:600;
-    }
-
-    .nav-links a:hover{
-      opacity:.7;
-    }
-
-    .menu-btn{
-      display:none;
-      background:none;
-      border:0;
-      color:white;
-      font-size:28px;
-      cursor:pointer;
-    }
-
-    /* HERO */
-    .hero{
-      background:#111;
-      color:white;
-      padding:80px 20px;
-    }
-
-    .hero-inner{
-      max-width:1250px;
-      margin:auto;
-    }
-
-    .hero h1{
-      font-size:52px;
-      line-height:1.1;
-      max-width:700px;
-      margin-bottom:20px;
-    }
-
-    .hero p{
-      font-size:18px;
-      color:#d1d5db;
-      max-width:650px;
-      line-height:1.7;
-      margin-bottom:30px;
-    }
-
-    .hero-btn{
-      display:inline-block;
-      background:white;
-      color:#111;
-      padding:14px 24px;
-      border-radius:8px;
-      font-weight:700;
-    }
-
-    /* MAIN */
-    .container{
-      max-width:1250px;
-      margin:auto;
-      padding:55px 20px;
-    }
-
-    .section-title{
-      font-size:32px;
-      margin-bottom:30px;
-    }
-
-    /* PRODUCTS */
-    .products{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:24px;
-    }
-
-    .product-card{
-      background:white;
-      border:1px solid #e5e7eb;
-      border-radius:12px;
-      overflow:hidden;
-      transition:.2s;
-    }
-
-    .product-card:hover{
-      transform:translateY(-3px);
-      box-shadow:0 12px 30px rgba(0,0,0,.08);
-    }
-
-    .product-image{
-      width:100%;
-      height:250px;
-      object-fit:cover;
-      display:block;
-      background:#eee;
-    }
-
-    .product-info{
-      padding:18px;
-    }
-
-    .category{
-      color:#777;
-      font-size:12px;
-      text-transform:uppercase;
-      margin-bottom:8px;
-    }
-
-    .product-name{
-      font-size:18px;
-      font-weight:700;
-      margin-bottom:10px;
-      line-height:1.4;
-    }
-
-    .price{
-      font-size:22px;
-      font-weight:800;
-      margin-bottom:10px;
-    }
-
-    .stock{
-      font-size:14px;
-      color:#15803d;
-      margin-bottom:15px;
-    }
-
-    .view-btn{
-      width:100%;
-      border:0;
-      background:#111;
-      color:white;
-      padding:13px;
-      border-radius:7px;
-      cursor:pointer;
-      font-weight:700;
-      font-size:14px;
-    }
-
-    .view-btn:hover{
-      background:#333;
-    }
-
-    /* ABOUT / CONTACT */
-    .info-section{
-      background:white;
-      border-top:1px solid #e5e7eb;
-    }
-
-    .info-box{
-      max-width:900px;
-      margin:auto;
-    }
-
-    .info-box h2{
-      font-size:32px;
-      margin-bottom:18px;
-    }
-
-    .info-box p{
-      color:#4b5563;
-      line-height:1.8;
-      margin-bottom:15px;
-      font-size:16px;
-    }
-
-    .contact-box{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:20px;
-      margin-top:25px;
-    }
-
-    .contact-item{
-      background:#f7f7f7;
-      padding:22px;
-      border-radius:10px;
-    }
-
-    .contact-item strong{
-      display:block;
-      margin-bottom:8px;
-    }
-
-    /* MODAL */
-    .modal{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.65);
-      z-index:2000;
-      overflow-y:auto;
-      padding:35px 15px;
-    }
-
-    .modal.active{
-      display:flex;
-      justify-content:center;
-      align-items:flex-start;
-    }
-
-    .modal-box{
-      background:white;
-      width:100%;
-      max-width:900px;
-      border-radius:14px;
-      overflow:hidden;
-      position:relative;
-      margin:auto;
-    }
-
-    .close{
-      position:absolute;
-      right:18px;
-      top:18px;
-      width:40px;
-      height:40px;
-      border:0;
-      border-radius:50%;
-      background:#111;
-      color:white;
-      font-size:20px;
-      cursor:pointer;
-      z-index:10;
-    }
-
-    .modal-content{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-    }
-
-    .modal-left{
-      background:#f3f4f6;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:25px;
-      min-height:500px;
-    }
-
-    .modal-left img{
-      width:100%;
-      max-width:430px;
-      max-height:480px;
-      object-fit:contain;
-      border-radius:8px;
-    }
-
-    .modal-right{
-      padding:40px;
-    }
-
-    .modal-category{
-      font-size:13px;
-      color:#777;
-      text-transform:uppercase;
-      margin-bottom:15px;
-    }
-
-    .modal-right h2{
-      font-size:30px;
-      margin-bottom:15px;
-    }
-
-    .modal-price{
-      font-size:27px;
-      font-weight:800;
-      margin-bottom:15px;
-    }
-
-    .modal-stock{
-      color:#15803d;
-      margin-bottom:20px;
-    }
-
-    .description{
-      color:#4b5563;
-      line-height:1.7;
-      margin-bottom:25px;
-      white-space:pre-line;
-    }
-
-    .order-title{
-      font-size:21px;
-      margin:25px 0 18px;
-      padding-top:20px;
-      border-top:1px solid #ddd;
-    }
-
-    /* FORM */
-    .form-group{
-      margin-bottom:15px;
-    }
-
-    .form-group label{
-      display:block;
-      font-size:14px;
-      font-weight:700;
-      margin-bottom:7px;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select{
-      width:100%;
-      padding:12px;
-      border:1px solid #d1d5db;
-      border-radius:7px;
-      outline:none;
-      font-size:14px;
-    }
-
-    .form-group textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus{
-      border-color:#111;
-    }
-
-    .order-btn{
-      width:100%;
-      padding:14px;
-      background:#111;
-      color:white;
-      border:0;
-      border-radius:7px;
-      font-size:15px;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    .order-btn:disabled{
-      opacity:.6;
-      cursor:not-allowed;
-    }
-
-    .message{
-      margin-top:15px;
-      padding:12px;
-      border-radius:7px;
-      display:none;
-      font-size:14px;
-    }
-
-    .success{
-      display:block;
-      background:#dcfce7;
-      color:#166534;
-    }
-
-    .error{
-      display:block;
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    /* LOADING */
-    .loading{
-      text-align:center;
-      padding:50px;
-      color:#777;
-      grid-column:1/-1;
-    }
-
-    /* FOOTER */
-    footer{
-      background:#111;
-      color:white;
-      margin-top:30px;
-    }
-
-    .footer-inner{
-      max-width:1250px;
-      margin:auto;
-      padding:35px 20px;
-      text-align:center;
-    }
-
-    .footer-inner p{
-      color:#aaa;
-      margin:7px 0;
-    }
-
-    .social-links{
-      margin-top:15px;
-      display:flex;
-      justify-content:center;
-      gap:20px;
-    }
-
-    .social-links a{
-      color:white;
-      font-weight:600;
-    }
-
-    /* MOBILE */
-    @media(max-width:1000px){
-      .products{
-        grid-template-columns:repeat(3,1fr);
-      }
-    }
-
-    @media(max-width:750px){
-      .nav-links{
-        display:none;
-        position:absolute;
-        top:65px;
-        left:0;
-        right:0;
-        background:#111;
-        flex-direction:column;
-        padding:20px;
-        gap:20px;
-      }
-
-      .nav-links.show{
-        display:flex;
-      }
-
-      .menu-btn{
-        display:block;
-      }
-
-      .hero{
-        padding:55px 20px;
-      }
-
-      .hero h1{
-        font-size:38px;
-      }
-
-      .products{
-        grid-template-columns:repeat(2,1fr);
-        gap:15px;
-      }
-
-      .product-image{
-        height:210px;
-      }
-
-      .modal-content{
-        grid-template-columns:1fr;
-      }
-
-      .modal-left{
-        min-height:auto;
-        padding:20px;
-      }
-
-      .modal-left img{
-        max-height:350px;
-      }
-
-      .modal-right{
-        padding:25px;
-      }
-
-      .contact-box{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media(max-width:480px){
-      .products{
-        grid-template-columns:1fr;
-      }
-
-      .product-image{
-        height:260px;
-      }
-
-      .section-title{
-        font-size:27px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Store - Online Shopping Pakistan</title>
+<meta name="description" content="Shop quality products online in Pakistan. Easy ordering and reliable service.">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f6f7f9;
+  color:#111827;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+button,input,textarea,select{
+  font-family:inherit;
+}
+
+/* HEADER */
+
+header{
+  background:#111;
+  color:white;
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+
+.nav{
+  max-width:1250px;
+  margin:auto;
+  padding:17px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:26px;
+  font-weight:800;
+}
+
+.nav-links{
+  display:flex;
+  gap:28px;
+}
+
+.nav-links a{
+  color:white;
+  font-size:15px;
+  font-weight:600;
+}
+
+.nav-links a:hover{
+  opacity:.7;
+}
+
+.menu-btn{
+  display:none;
+  background:none;
+  border:0;
+  color:white;
+  font-size:28px;
+  cursor:pointer;
+}
+
+/* HERO */
+
+.hero{
+  background:#111;
+  color:white;
+  padding:75px 20px;
+}
+
+.hero-inner{
+  max-width:1250px;
+  margin:auto;
+}
+
+.hero h1{
+  font-size:50px;
+  max-width:700px;
+  line-height:1.1;
+  margin-bottom:20px;
+}
+
+.hero p{
+  max-width:650px;
+  color:#d1d5db;
+  line-height:1.7;
+  font-size:18px;
+  margin-bottom:30px;
+}
+
+.hero-btn{
+  display:inline-block;
+  background:white;
+  color:#111;
+  padding:14px 25px;
+  border-radius:8px;
+  font-weight:700;
+}
+
+/* CONTAINER */
+
+.container{
+  max-width:1250px;
+  margin:auto;
+  padding:55px 20px;
+}
+
+.section-title{
+  font-size:32px;
+  margin-bottom:25px;
+}
+
+/* FILTERS */
+
+.filters{
+  display:flex;
+  gap:12px;
+  margin-bottom:30px;
+  flex-wrap:wrap;
+}
+
+.filters input,
+.filters select{
+  padding:13px 15px;
+  border:1px solid #d1d5db;
+  background:white;
+  border-radius:8px;
+  outline:none;
+}
+
+.filters input{
+  flex:1;
+  min-width:220px;
+}
+
+.filters select{
+  min-width:170px;
+}
+
+/* PRODUCTS */
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:24px;
+}
+
+.product-card{
+  background:white;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  overflow:hidden;
+  transition:.2s;
+}
+
+.product-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 28px rgba(0,0,0,.08);
+}
+
+.product-image{
+  width:100%;
+  height:250px;
+  object-fit:cover;
+  display:block;
+  background:#eee;
+}
+
+.product-info{
+  padding:18px;
+}
+
+.category{
+  color:#777;
+  font-size:12px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.product-name{
+  font-size:18px;
+  font-weight:700;
+  line-height:1.4;
+  margin-bottom:10px;
+}
+
+.price{
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.stock{
+  color:#15803d;
+  font-size:14px;
+  margin-bottom:15px;
+}
+
+.out-stock{
+  color:#dc2626;
+}
+
+.view-btn{
+  width:100%;
+  border:0;
+  background:#111;
+  color:white;
+  padding:13px;
+  border-radius:7px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.view-btn:hover{
+  background:#333;
+}
+
+.view-btn:disabled{
+  background:#999;
+  cursor:not-allowed;
+}
+
+.loading{
+  grid-column:1/-1;
+  text-align:center;
+  padding:50px;
+  color:#777;
+}
+
+/* INFO */
+
+.info-section{
+  background:white;
+  border-top:1px solid #e5e7eb;
+}
+
+.info-box{
+  max-width:900px;
+  margin:auto;
+}
+
+.info-box h2{
+  font-size:32px;
+  margin-bottom:18px;
+}
+
+.info-box p{
+  color:#4b5563;
+  line-height:1.8;
+  margin-bottom:15px;
+}
+
+.contact-box{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+  margin-top:25px;
+}
+
+.contact-item{
+  background:#f5f5f5;
+  padding:22px;
+  border-radius:10px;
+}
+
+.contact-item strong{
+  display:block;
+  margin-bottom:8px;
+}
+
+/* MODAL */
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  z-index:2000;
+  overflow-y:auto;
+  padding:30px 15px;
+}
+
+.modal.active{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+}
+
+.modal-box{
+  background:white;
+  width:100%;
+  max-width:900px;
+  border-radius:14px;
+  overflow:hidden;
+  position:relative;
+  margin:auto;
+}
+
+.close{
+  position:absolute;
+  right:15px;
+  top:15px;
+  width:40px;
+  height:40px;
+  border:0;
+  border-radius:50%;
+  background:#111;
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+  z-index:20;
+}
+
+.modal-content{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+.modal-left{
+  background:#f3f4f6;
+  min-height:480px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:25px;
+}
+
+.modal-left img{
+  width:100%;
+  max-width:430px;
+  max-height:460px;
+  object-fit:contain;
+  border-radius:8px;
+}
+
+.modal-right{
+  padding:40px;
+}
+
+.modal-category{
+  color:#777;
+  font-size:13px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+
+.modal-right h2{
+  font-size:30px;
+  margin-bottom:15px;
+}
+
+.modal-price{
+  font-size:27px;
+  font-weight:800;
+  margin-bottom:15px;
+}
+
+.modal-stock{
+  color:#15803d;
+  margin-bottom:20px;
+}
+
+.modal-description{
+  color:#4b5563;
+  line-height:1.7;
+  margin-bottom:25px;
+  white-space:pre-line;
+}
+
+.order-title{
+  font-size:21px;
+  padding-top:20px;
+  border-top:1px solid #ddd;
+  margin-bottom:18px;
+}
+
+/* FORM */
+
+.form-group{
+  margin-bottom:15px;
+}
+
+.form-group label{
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:7px;
+}
+
+.form-group input,
+.form-group textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #d1d5db;
+  border-radius:7px;
+  outline:none;
+  font-size:14px;
+}
+
+.form-group textarea{
+  min-height:85px;
+  resize:vertical;
+}
+
+.order-btn{
+  width:100%;
+  padding:14px;
+  background:#111;
+  color:white;
+  border:0;
+  border-radius:7px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.order-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.whatsapp-btn{
+  display:block;
+  width:100%;
+  text-align:center;
+  margin-top:10px;
+  padding:14px;
+  background:#25D366;
+  color:white;
+  border-radius:7px;
+  font-weight:700;
+}
+
+.message{
+  margin-top:15px;
+  padding:12px;
+  border-radius:7px;
+  display:none;
+  line-height:1.5;
+  font-size:14px;
+}
+
+.message.success{
+  display:block;
+  background:#dcfce7;
+  color:#166534;
+}
+
+.message.error{
+  display:block;
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+/* FOOTER */
+
+footer{
+  background:#111;
+  color:white;
+  margin-top:30px;
+}
+
+.footer-inner{
+  max-width:1250px;
+  margin:auto;
+  padding:35px 20px;
+  text-align:center;
+}
+
+.footer-inner p{
+  color:#aaa;
+  margin:8px 0;
+}
+
+.footer-links{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  margin-top:15px;
+}
+
+/* MOBILE */
+
+@media(max-width:1000px){
+
+  .products{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+}
+
+@media(max-width:750px){
+
+  .nav-links{
+    display:none;
+    position:absolute;
+    top:64px;
+    left:0;
+    right:0;
+    background:#111;
+    flex-direction:column;
+    padding:20px;
+    gap:20px;
+  }
+
+  .nav-links.show{
+    display:flex;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+
+  .hero{
+    padding:55px 20px;
+  }
+
+  .hero h1{
+    font-size:38px;
+  }
+
+  .products{
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+  }
+
+  .product-image{
+    height:210px;
+  }
+
+  .modal-content{
+    grid-template-columns:1fr;
+  }
+
+  .modal-left{
+    min-height:auto;
+  }
+
+  .modal-left img{
+    max-height:350px;
+  }
+
+  .modal-right{
+    padding:25px;
+  }
+
+  .contact-box{
+    grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:480px){
+
+  .products{
+    grid-template-columns:1fr;
+  }
+
+  .product-image{
+    height:270px;
+  }
+
+  .section-title{
+    font-size:28px;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+
 <header>
-  <div class="nav">
 
-    <a href="/" class="logo">My Store</a>
+<div class="nav">
 
-    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+<a href="/" class="logo">My Store</a>
 
-    <nav class="nav-links" id="navLinks">
-      <a href="#home" onclick="closeMenu()">Home</a>
-      <a href="#products" onclick="closeMenu()">Products</a>
-      <a href="#about" onclick="closeMenu()">About Us</a>
-      <a href="#contact" onclick="closeMenu()">Contact</a>
-    </nav>
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
 
-  </div>
+<nav class="nav-links" id="navLinks">
+
+<a href="#home" onclick="closeMenu()">Home</a>
+<a href="#products" onclick="closeMenu()">Products</a>
+<a href="#about" onclick="closeMenu()">About Us</a>
+<a href="#contact" onclick="closeMenu()">Contact</a>
+
+</nav>
+
+</div>
+
 </header>
 
+
 <!-- HERO -->
+
 <section class="hero" id="home">
-  <div class="hero-inner">
-    <h1>Quality Products, Simple Shopping.</h1>
 
-    <p>
-      Discover useful and quality products at affordable prices.
-      Browse our collection and place your order easily online.
-    </p>
+<div class="hero-inner">
 
-    <a href="#products" class="hero-btn">Shop Now</a>
-  </div>
+<h1>Quality Products, Simple Shopping.</h1>
+
+<p>
+Discover useful and quality products at affordable prices.
+Browse our collection and place your order easily online.
+</p>
+
+<a href="#products" class="hero-btn">
+Shop Now
+</a>
+
+</div>
+
 </section>
 
 
 <!-- PRODUCTS -->
+
 <section class="container" id="products">
 
-  <h2 class="section-title">Our Products</h2>
+<h2 class="section-title">
+Our Products
+</h2>
 
-  <div class="products" id="productsGrid">
-    <div class="loading">Loading products...</div>
-  </div>
+<div class="filters">
+
+<input
+type="text"
+id="searchInput"
+placeholder="Search products..."
+oninput="filterProducts()"
+>
+
+<select
+id="categoryFilter"
+onchange="filterProducts()"
+>
+
+<option value="all">
+All Categories
+</option>
+
+</select>
+
+</div>
+
+<div class="products" id="productsGrid">
+
+<div class="loading">
+Loading products...
+</div>
+
+</div>
 
 </section>
 
 
 <!-- ABOUT -->
+
 <section class="info-section" id="about">
-  <div class="container">
 
-    <div class="info-box">
+<div class="container">
 
-      <h2>About Us</h2>
+<div class="info-box">
 
-      <p>
-        Welcome to My Store, your simple and reliable online shopping
-        destination in Pakistan.
-      </p>
+<h2>About Us</h2>
 
-      <p>
-        We aim to provide useful and quality products at reasonable prices.
-        Our goal is to make online shopping easy, convenient and comfortable
-        for our customers.
-      </p>
+<p>
+Welcome to My Store, your simple and reliable online shopping
+destination in Pakistan.
+</p>
 
-      <p>
-        Every order is handled with care and we try our best to provide
-        a smooth shopping experience from product selection to delivery.
-      </p>
+<p>
+We aim to provide useful and quality products at reasonable prices.
+Our goal is to make online shopping easy, convenient and comfortable
+for our customers.
+</p>
 
-      <p>
-        Thank you for choosing My Store. We appreciate your trust and support.
-      </p>
+<p>
+Every order is handled with care and we try our best to provide
+a smooth shopping experience from product selection to delivery.
+</p>
 
-    </div>
+<p>
+Thank you for choosing My Store. We appreciate your trust and support.
+</p>
 
-  </div>
+</div>
+
+</div>
+
 </section>
 
 
 <!-- CONTACT -->
+
 <section class="info-section" id="contact">
-  <div class="container">
 
-    <div class="info-box">
+<div class="container">
 
-      <h2>Contact Us</h2>
+<div class="info-box">
 
-      <p>
-        Have a question about a product or your order?
-        Feel free to contact us. Our team will be happy to help you.
-      </p>
+<h2>Contact Us</h2>
 
-      <div class="contact-box">
+<p>
+Have a question about a product or your order?
+Feel free to contact us. We will be happy to help you.
+</p>
 
-        <div class="contact-item">
-          <strong>📞 Phone</strong>
-          <a href="tel:03320047290">0332-0047290</a>
-        </div>
+<div class="contact-box">
 
-        <div class="contact-item">
-          <strong>✉️ Email</strong>
-          <a href="mailto:grandboy770@gmail.com">
-            grandboy770@gmail.com
-          </a>
-        </div>
+<div class="contact-item">
 
-      </div>
+<strong>📞 Phone</strong>
 
-    </div>
+<a href="tel:03320047290">
+0332-0047290
+</a>
 
-  </div>
+</div>
+
+<div class="contact-item">
+
+<strong>✉️ Email</strong>
+
+<a href="mailto:grandboy770@gmail.com">
+grandboy770@gmail.com
+</a>
+
+</div>
+
+<div class="contact-item">
+
+<strong>💬 WhatsApp</strong>
+
+<a
+href="https://wa.me/923320047290"
+target="_blank"
+>
+Chat on WhatsApp
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </section>
 
 
 <!-- FOOTER -->
+
 <footer>
-  <div class="footer-inner">
 
-    <strong>My Store</strong>
+<div class="footer-inner">
 
-    <p>Quality products. Simple shopping.</p>
+<strong>My Store</strong>
 
-    <p>© 2026 My Store. All rights reserved.</p>
+<p>
+Quality products. Simple shopping.
+</p>
 
-    <div class="social-links">
-      <a href="#contact">Contact</a>
-      <a href="#about">About Us</a>
-    </div>
+<p>
+© 2026 My Store. All rights reserved.
+</p>
 
-  </div>
+<div class="footer-links">
+
+<a href="#home">
+Home
+</a>
+
+<a href="#about">
+About
+</a>
+
+<a href="#contact">
+Contact
+</a>
+
+</div>
+
+</div>
+
 </footer>
 
 
 <!-- PRODUCT MODAL -->
+
 <div class="modal" id="productModal">
 
-  <div class="modal-box">
+<div class="modal-box">
 
-    <button class="close" onclick="closeProduct()">×</button>
+<button class="close" onclick="closeProduct()">
+×
+</button>
 
-    <div class="modal-content">
+<div class="modal-content">
 
-      <div class="modal-left">
-        <img id="modalImage" src="" alt="Product">
-      </div>
+<div class="modal-left">
 
-      <div class="modal-right">
+<img
+id="modalImage"
+src=""
+alt="Product"
+>
 
-        <div class="modal-category" id="modalCategory"></div>
+</div>
 
-        <h2 id="modalName"></h2>
+<div class="modal-right">
 
-        <div class="modal-price" id="modalPrice"></div>
+<div
+class="modal-category"
+id="modalCategory"
+>
+</div>
 
-        <div class="modal-stock" id="modalStock"></div>
+<h2 id="modalName">
+</h2>
 
-        <div class="description" id="modalDescription"></div>
+<div
+class="modal-price"
+id="modalPrice"
+>
+</div>
 
-        <h3 class="order-title">Place Your Order</h3>
+<div
+class="modal-stock"
+id="modalStock"
+>
+</div>
 
-        <form id="orderForm">
+<div
+class="modal-description"
+id="modalDescription"
+>
+</div>
 
-          <div class="form-group">
-            <label>Full Name *</label>
-            <input
-              type="text"
-              id="customerName"
-              placeholder="Your full name"
-              required
-            >
-          </div>
+<h3 class="order-title">
+Place Your Order
+</h3>
 
-          <div class="form-group">
-            <label>Phone Number *</label>
-            <input
-              type="tel"
-              id="phone"
-              placeholder="03XXXXXXXXX"
-              required
-            >
-          </div>
+<form id="orderForm">
 
-          <div class="form-group">
-            <label>Complete Address *</label>
-            <textarea
-              id="address"
-              placeholder="House number, street, area..."
-              required
-            ></textarea>
-          </div>
+<div class="form-group">
 
-          <div class="form-group">
-            <label>City *</label>
-            <input
-              type="text"
-              id="city"
-              placeholder="Your city"
-              required
-            >
-          </div>
+<label>
+Full Name *
+</label>
 
-          <div class="form-group">
-            <label>Quantity *</label>
-            <input
-              type="number"
-              id="quantity"
-              value="1"
-              min="1"
-              required
-            >
-          </div>
+<input
+type="text"
+id="customerName"
+placeholder="Your full name"
+required
+>
 
-          <div class="form-group">
-            <label>Note (Optional)</label>
-            <textarea
-              id="note"
-              placeholder="Any special instructions..."
-            ></textarea>
-          </div>
+</div>
 
-          <button
-            type="submit"
-            class="order-btn"
-            id="orderBtn"
-          >
-            Place Order
-          </button>
 
-          <div class="message" id="orderMessage"></div>
+<div class="form-group">
 
-        </form>
+<label>
+Phone Number *
+</label>
 
-      </div>
+<input
+type="tel"
+id="phone"
+placeholder="03XXXXXXXXX"
+required
+>
 
-    </div>
+</div>
 
-  </div>
+
+<div class="form-group">
+
+<label>
+Complete Address *
+</label>
+
+<textarea
+id="address"
+placeholder="House number, street, area..."
+required
+></textarea>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+City *
+</label>
+
+<input
+type="text"
+id="city"
+placeholder="Your city"
+required
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Quantity *
+</label>
+
+<input
+type="number"
+id="quantity"
+value="1"
+min="1"
+required
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Note (Optional)
+</label>
+
+<textarea
+id="note"
+placeholder="Any special instructions..."
+></textarea>
+
+</div>
+
+
+<button
+type="submit"
+class="order-btn"
+id="orderBtn"
+>
+Place Order
+</button>
+
+
+<a
+href="https://wa.me/923320047290"
+target="_blank"
+class="whatsapp-btn"
+id="whatsappBtn"
+>
+💬 WhatsApp Us
+</a>
+
+
+<div
+class="message"
+id="orderMessage"
+>
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
 
 <script>
 
-  /* SUPABASE */
+/* SUPABASE */
 
-  const SUPABASE_URL =
-    "https://qmchlafchuvldumxurbl.supabase.co";
+const SUPABASE_URL =
+"https://qmchlafchuvldumxurbl.supabase.co";
 
-  const SUPABASE_KEY =
-    "sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
+const SUPABASE_KEY =
+"sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
 
-  const db = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+const db =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
 
-  let allProducts = [];
-  let selectedProduct = null;
+/* VARIABLES */
 
+let allProducts = [];
 
-  /* MOBILE MENU */
+let selectedProduct = null;
 
-  function toggleMenu(){
-    document
-      .getElementById("navLinks")
-      .classList.toggle("show");
-  }
 
-  function closeMenu(){
-    document
-      .getElementById("navLinks")
-      .classList.remove("show");
-  }
+/* MOBILE MENU */
 
+function toggleMenu(){
 
-  /* LOAD PRODUCTS */
+document
+.getElementById("navLinks")
+.classList.toggle("show");
 
-  async function loadProducts(){
+}
 
-    const grid =
-      document.getElementById("productsGrid");
 
-    grid.innerHTML =
-      '<div class="loading">Loading products...</div>';
+function closeMenu(){
 
-    const { data, error } =
-      await db
-        .from("products")
-        .select("*")
-        .eq("status","active")
-        .order("created_at",{ascending:false});
+document
+.getElementById("navLinks")
+.classList.remove("show");
 
-    if(error){
+}
 
-      console.error(error);
 
-      grid.innerHTML =
-        '<div class="loading">Unable to load products.</div>';
+/* LOAD PRODUCTS */
 
-      return;
-    }
+async function loadProducts(){
 
-    allProducts = data || [];
+const grid =
+document.getElementById("productsGrid");
 
-    if(allProducts.length === 0){
+grid.innerHTML =
+'<div class="loading">Loading products...</div>';
 
-      grid.innerHTML =
-        '<div class="loading">No products available right now.</div>';
 
-      return;
-    }
+const {data,error} =
+await db
+.from("products")
+.select("*")
+.eq("status","active")
+.order("created_at",{ascending:false});
 
-    grid.innerHTML = "";
 
-    allProducts.forEach(product => {
+if(error){
 
-      const card =
-        document.createElement("div");
+console.error(error);
 
-      card.className = "product-card";
+grid.innerHTML =
+'<div class="loading">Unable to load products.</div>';
 
-      const image =
-        product.image_url ||
-        "https://via.placeholder.com/600x500?text=Product";
+return;
 
-      const category =
-        product.category || "General";
+}
 
-      const stock =
-        Number(product.stock || 0);
 
-      card.innerHTML = `
+allProducts = data || [];
 
-        <img
-          class="product-image"
-          src="${escapeHtml(image)}"
-          alt="${escapeHtml(product.name)}"
-          onerror="this.src='https://via.placeholder.com/600x500?text=Product'"
-        >
 
-        <div class="product-info">
+/* CATEGORY FILTER */
 
-          <div class="category">
-            ${escapeHtml(category)}
-          </div>
+const categoryFilter =
+document.getElementById("categoryFilter");
 
-          <div class="product-name">
-            ${escapeHtml(product.name)}
-          </div>
+const categories =
+[
+...new Set(
+allProducts
+.map(p => p.category || "General")
+)
+];
 
-          <div class="price">
-            Rs. ${formatPrice(product.price)}
-          </div>
 
-          <div class="stock">
-            ${stock > 0
-              ? "✓ In Stock"
-              : "✕ Out of Stock"}
-          </div>
+categoryFilter.innerHTML =
+'<option value="all">All Categories</option>';
 
-          <button
-            class="view-btn"
-            onclick="openProduct('${product.id}')"
-            ${stock <= 0 ? "disabled" : ""}
-          >
-            ${stock > 0 ? "View Product" : "Out of Stock"}
-          </button>
 
-        </div>
-      `;
+categories.forEach(category => {
 
-      grid.appendChild(card);
+const option =
+document.createElement("option");
 
-    });
+option.value = category;
 
-  }
+option.textContent = category;
 
+categoryFilter.appendChild(option);
 
-  /* OPEN PRODUCT */
+});
 
-  function openProduct(id){
 
-    selectedProduct =
-      allProducts.find(
-        product => String(product.id) === String(id)
-      );
+displayProducts(allProducts);
 
-    if(!selectedProduct) return;
 
-    const image =
-      selectedProduct.image_url ||
-      "https://via.placeholder.com/600x500?text=Product";
+/* OPEN PRODUCT FROM URL */
 
-    document.getElementById("modalImage").src = image;
+openProductFromUrl();
 
-    document.getElementById("modalCategory").textContent =
-      selectedProduct.category || "General";
+}
 
-    document.getElementById("modalName").textContent =
-      selectedProduct.name || "";
 
-    document.getElementById("modalPrice").textContent =
-      "Rs. " + formatPrice(selectedProduct.price);
+/* DISPLAY PRODUCTS */
 
-    const stock =
-      Number(selectedProduct.stock || 0);
+function displayProducts(products){
 
-    document.getElementById("modalStock").textContent =
-      stock > 0
-        ? "✓ In Stock — " + stock + " available"
-        : "✕ Out of Stock";
+const grid =
+document.getElementById("productsGrid");
 
+grid.innerHTML = "";
 
-    /*
-      IMPORTANT:
-      Agar purane product description mein /admin.html
-      save hua hua hai to usay storefront par show nahi karenge.
-    */
 
-    let description =
-      selectedProduct.description || "";
+if(products.length === 0){
 
-    if(
-      description.trim() === "/admin.html" ||
-      description.trim().toLowerCase() === "admin.html"
-    ){
-      description = "";
-    }
+grid.innerHTML =
+'<div class="loading">No products found.</div>';
 
-    document.getElementById("modalDescription").textContent =
-      description;
+return;
 
+}
 
-    /* UNIQUE PRODUCT URL */
 
-    if(selectedProduct.slug){
+products.forEach(product => {
 
-      const url =
-        window.location.origin +
-        window.location.pathname +
-        "?product=" +
-        encodeURIComponent(selectedProduct.slug);
+const card =
+document.createElement("div");
 
-      window.history.pushState(
-        {},
-        "",
-        url
-      );
-    }
+card.className =
+"product-card";
 
 
-    document.getElementById("quantity").value = 1;
+const image =
+product.image_url ||
+"https://via.placeholder.com/600x500?text=Product";
 
-    document.getElementById("orderMessage").className =
-      "message";
 
-    document.getElementById("orderMessage").textContent = "";
+const stock =
+Number(product.stock || 0);
 
-    document.getElementById("productModal")
-      .classList.add("active");
 
-    document.body.style.overflow = "hidden";
-  }
+card.innerHTML = `
 
+<img
+class="product-image"
+src="${escapeHtml(image)}"
+alt="${escapeHtml(product.name)}"
+onerror="this.src='https://via.placeholder.com/600x500?text=Product'"
+>
 
-  /* CLOSE PRODUCT */
+<div class="product-info">
 
-  function closeProduct(){
+<div class="category">
+${escapeHtml(product.category || "General")}
+</div>
 
-    document.getElementById("productModal")
-      .classList.remove("active");
+<div class="product-name">
+${escapeHtml(product.name)}
+</div>
 
-    document.body.style.overflow = "";
+<div class="price">
+Rs. ${formatPrice(product.price)}
+</div>
 
-    const cleanUrl =
-      window.location.origin +
-      window.location.pathname;
+<div class="stock ${stock <= 0 ? "out-stock" : ""}">
+${
+stock > 0
+? "✓ In Stock — " + stock + " available"
+: "✕ Out of Stock"
+}
+</div>
 
-    window.history.pushState(
-      {},
-      "",
-      cleanUrl
-    );
+<button
+class="view-btn"
+onclick="openProduct('${product.id}')"
+${stock <= 0 ? "disabled" : ""}
+>
+${
+stock > 0
+? "View Product"
+: "Out of Stock"
+}
+</button>
 
-    selectedProduct = null;
-  }
+</div>
+`;
 
+grid.appendChild(card);
 
-  /* CLICK OUTSIDE MODAL */
+});
 
-  document.getElementById("productModal")
-    .addEventListener("click", function(e){
+}
 
-      if(e.target === this){
-        closeProduct();
-      }
 
-    });
+/* SEARCH + CATEGORY */
 
+function filterProducts(){
 
-  /* ORDER */
+const search =
+document
+.getElementById("searchInput")
+.value
+.toLowerCase()
+.trim();
 
-  document.getElementById("orderForm")
-    .addEventListener("submit", async function(e){
 
-      e.preventDefault();
+const category =
+document
+.getElementById("categoryFilter")
+.value;
 
-      if(!selectedProduct) return;
 
-      const name =
-        document.getElementById("customerName")
-          .value.trim();
+const filtered =
+allProducts.filter(product => {
 
-      const phone =
-        document.getElementById("phone")
-          .value.trim();
+const name =
+(product.name || "")
+.toLowerCase();
 
-      const address =
-        document.getElementById("address")
-          .value.trim();
+const description =
+(product.description || "")
+.toLowerCase();
 
-      const city =
-        document.getElementById("city")
-          .value.trim();
+const productCategory =
+product.category || "General";
 
-      const quantity =
-        Number(
-          document.getElementById("quantity").value
-        );
 
-      const note =
-        document.getElementById("note")
-          .value.trim();
+const matchesSearch =
+name.includes(search) ||
+description.includes(search);
 
 
-      const stock =
-        Number(selectedProduct.stock || 0);
+const matchesCategory =
+category === "all" ||
+productCategory === category;
 
 
-      if(quantity < 1){
+return matchesSearch && matchesCategory;
 
-        showMessage(
-          "Please enter a valid quantity.",
-          "error"
-        );
+});
 
-        return;
-      }
 
+displayProducts(filtered);
 
-      if(quantity > stock){
+}
 
-        showMessage(
-          "Only " + stock + " item(s) are available.",
-          "error"
-        );
 
-        return;
-      }
+/* OPEN PRODUCT */
 
+function openProduct(id){
 
-      const button =
-        document.getElementById("orderBtn");
+selectedProduct =
+allProducts.find(
+product =>
+String(product.id) === String(id)
+);
 
-      button.disabled = true;
-      button.textContent = "Placing Order...";
 
+if(!selectedProduct) return;
 
-      const { error } =
-        await db
-          .from("orders")
-          .insert([{
 
-            product_id:selectedProduct.id,
+const image =
+selectedProduct.image_url ||
+"https://via.placeholder.com/600x500?text=Product";
 
-            customer_name:name,
 
-            phone:phone,
+document
+.getElementById("modalImage")
+.src = image;
 
-            address:address,
 
-            city:city,
+document
+.getElementById("modalCategory")
+.textContent =
+selectedProduct.category || "General";
 
-            quantity:quantity,
 
-            note:note,
+document
+.getElementById("modalName")
+.textContent =
+selectedProduct.name || "";
 
-            status:"pending"
 
-          }]);
+document
+.getElementById("modalPrice")
+.textContent =
+"Rs. " +
+formatPrice(selectedProduct.price);
 
 
-      if(error){
+const stock =
+Number(selectedProduct.stock || 0);
 
-        console.error(error);
 
-        showMessage(
-          "Order could not be placed. Please try again.",
-          "error"
-        );
+document
+.getElementById("modalStock")
+.textContent =
+stock > 0
+? "✓ In Stock — " + stock + " available"
+: "✕ Out of Stock";
 
-        button.disabled = false;
-        button.textContent = "Place Order";
 
-        return;
-      }
+/*
+Remove unwanted old /admin.html text
+*/
 
+let description =
+selectedProduct.description || "";
 
-      showMessage(
-        "✓ Your order has been placed successfully! We will contact you soon.",
-        "success"
-      );
 
+if(
+description.trim() === "/admin.html" ||
+description.trim().toLowerCase() === "admin.html"
+){
 
-      document.getElementById("orderForm").reset();
+description = "";
 
-      document.getElementById("quantity").value = 1;
+}
 
-      button.disabled = false;
-      button.textContent = "Place Order";
 
-    });
+document
+.getElementById("modalDescription")
+.textContent =
+description;
 
 
-  /* MESSAGE */
+/* PRODUCT URL */
 
-  function showMessage(text,type){
+if(selectedProduct.slug){
 
-    const box =
-      document.getElementById("orderMessage");
+const url =
+window.location.origin +
+window.location.pathname +
+"?product=" +
+encodeURIComponent(
+selectedProduct.slug
+);
 
-    box.textContent = text;
+window.history.pushState(
+{},
+"",
+url
+);
 
-    box.className =
-      "message " + type;
+}
 
-  }
 
+/* RESET FORM */
 
-  /* FORMAT PRICE */
+document
+.getElementById("orderForm")
+.reset();
 
-  function formatPrice(price){
 
-    return Number(price || 0)
-      .toLocaleString("en-PK",{
-        maximumFractionDigits:0
-      });
+document
+.getElementById("quantity")
+.value = 1;
 
-  }
 
+document
+.getElementById("orderMessage")
+.className =
+"message";
 
-  /* BASIC HTML ESCAPE */
 
-  function escapeHtml(value){
+document
+.getElementById("orderMessage")
+.textContent = "";
 
-    return String(value ?? "")
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#039;");
 
-  }
+/* WHATSAPP MESSAGE */
 
+updateWhatsAppButton();
 
-  /* OPEN PRODUCT FROM URL */
 
-  async function openProductFromUrl(){
+document
+.getElementById("productModal")
+.classList.add("active");
 
-    const params =
-      new URLSearchParams(
-        window.location.search
-      );
 
-    const slug =
-      params.get("product");
+document.body.style.overflow =
+"hidden";
 
-    if(!slug) return;
+}
 
-    const product =
-      allProducts.find(
-        item => item.slug === slug
-      );
 
-    if(product){
+/* WHATSAPP */
 
-      openProduct(product.id);
+function updateWhatsAppButton(){
 
-    }
+const button =
+document.getElementById("whatsappBtn");
 
-  }
 
+if(!selectedProduct){
 
-  /* START */
+button.href =
+"https://wa.me/923320047290";
 
-  async function start(){
+return;
 
-    await loadProducts();
+}
 
-    await openProductFromUrl();
 
-  }
+const quantity =
+document
+.getElementById("quantity")
+.value || 1;
 
-  start();
+
+const message =
+"Assalam o Alaikum,%0A%0A" +
+"I want to order:%0A" +
+"Product: " +
+selectedProduct.name +
+"%0A" +
+"Quantity: " +
+quantity +
+"%0A" +
+"Price: Rs. " +
+formatPrice(selectedProduct.price) +
+"%0A%0A" +
+"Please confirm my order.";
+
+
+button.href =
+"https://wa.me/923320047290?text=" +
+message;
+
+}
+
+
+document
+.getElementById("quantity")
+.addEventListener(
+"input",
+updateWhatsAppButton
+);
+
+
+/* CLOSE PRODUCT */
+
+function closeProduct(){
+
+document
+.getElementById("productModal")
+.classList.remove("active");
+
+
+document.body.style.overflow = "";
+
+
+window.history.pushState(
+{},
+"",
+window.location.origin +
+window.location.pathname
+);
+
+
+selectedProduct = null;
+
+}
+
+
+/* CLICK OUTSIDE */
+
+document
+.getElementById("productModal")
+.addEventListener(
+"click",
+function(e){
+
+if(e.target === this){
+
+closeProduct();
+
+}
+
+}
+);
+
+
+/* ORDER */
+
+document
+.getElementById("orderForm")
+.addEventListener(
+"submit",
+async function(e){
+
+e.preventDefault();
+
+
+if(!selectedProduct) return;
+
+
+const name =
+document
+.getElementById("customerName")
+.value.trim();
+
+
+const phone =
+document
+.getElementById("phone")
+.value.trim();
+
+
+const address =
+document
+.getElementById("address")
+.value.trim();
+
+
+const city =
+document
+.getElementById("city")
+.value.trim();
+
+
+const quantity =
+Number(
+document
+.getElementById("quantity")
+.value
+);
+
+
+const note =
+document
+.getElementById("note")
+.value.trim();
+
+
+/* VALIDATION */
+
+if(quantity < 1){
+
+showMessage(
+"Please enter a valid quantity.",
+"error"
+);
+
+return;
+
+}
+
+
+let currentStock =
+Number(selectedProduct.stock || 0);
+
+
+if(quantity > currentStock){
+
+showMessage(
+"Only " +
+currentStock +
+" item(s) are available.",
+"error"
+);
+
+return;
+
+}
+
+
+const button =
+document.getElementById("orderBtn");
+
+
+button.disabled = true;
+
+button.textContent =
+"Placing Order...";
+
+
+/* INSERT ORDER */
+
+const {data:orderData,error:orderError} =
+await db
+.from("orders")
+.insert([{
+
+product_id:
+selectedProduct.id,
+
+customer_name:
+name,
+
+phone:
+phone,
+
+address:
+address,
+
+city:
+city,
+
+quantity:
+quantity,
+
+note:
+note,
+
+status:
+"pending"
+
+}])
+.select()
+.single();
+
+
+if(orderError){
+
+console.error(orderError);
+
+showMessage(
+"Order could not be placed. Please try again.",
+"error"
+);
+
+button.disabled = false;
+
+button.textContent =
+"Place Order";
+
+return;
+
+}
+
+
+/*
+STOCK AUTOMATICALLY MINUS
+*/
+
+const newStock =
+currentStock - quantity;
+
+
+const {error:stockError} =
+await db
+.from("products")
+.update({
+stock:newStock
+})
+.eq("id",selectedProduct.id);
+
+
+if(stockError){
+
+console.error(stockError);
+
+}
+
+
+/* UPDATE LOCAL PRODUCT */
+
+selectedProduct.stock =
+newStock;
+
+
+const productIndex =
+allProducts.findIndex(
+p =>
+String(p.id) ===
+String(selectedProduct.id)
+);
+
+
+if(productIndex !== -1){
+
+allProducts[productIndex].stock =
+newStock;
+
+}
+
+
+/* SUCCESS */
+
+showMessage(
+"✓ Order placed successfully! We will contact you soon.",
+"success"
+);
+
+
+/* WHATSAPP LINK */
+
+const whatsappMessage =
+"Assalam o Alaikum,%0A%0A" +
+"New Order:%0A" +
+"Product: " +
+selectedProduct.name +
+"%0A" +
+"Quantity: " +
+quantity +
+"%0A" +
+"Customer: " +
+name +
+"%0A" +
+"Phone: " +
+phone +
+"%0A" +
+"City: " +
+city;
+
+
+document
+.getElementById("whatsappBtn")
+.href =
+"https://wa.me/923320047290?text=" +
+whatsappMessage;
+
+
+/* REFRESH PRODUCTS */
+
+displayProducts(
+allProducts
+);
+
+
+button.disabled = false;
+
+button.textContent =
+"Order Placed ✓";
+
+}
+);
+
+
+/* MESSAGE */
+
+function showMessage(text,type){
+
+const box =
+document
+.getElementById("orderMessage");
+
+
+box.textContent = text;
+
+box.className =
+"message " + type;
+
+}
+
+
+/* PRICE */
+
+function formatPrice(price){
+
+return Number(price || 0)
+.toLocaleString(
+"en-PK",
+{
+maximumFractionDigits:0
+}
+);
+
+}
+
+
+/* HTML ESCAPE */
+
+function escapeHtml(value){
+
+return String(value ?? "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+
+/* URL PRODUCT */
+
+function openProductFromUrl(){
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+
+const slug =
+params.get("product");
+
+
+if(!slug) return;
+
+
+const product =
+allProducts.find(
+item =>
+item.slug === slug
+);
+
+
+if(product){
+
+openProduct(product.id);
+
+}
+
+}
+
+
+/* START */
+
+loadProducts();
 
 </script>
 
