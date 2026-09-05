@@ -1,1 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Store - Admin</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5f5f5;
+  color:#222;
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:25px;
+}
+.card{
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  margin-bottom:20px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+h1,h2{margin-top:0}
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  margin:7px 0 15px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:15px;
+}
+textarea{min-height:100px}
+button{
+  background:#111;
+  color:white;
+  border:0;
+  padding:12px 20px;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:hover{opacity:.85}
+button.danger{background:#c62828}
+button.secondary{background:#555}
+.hidden{display:none}
+.message{
+  padding:12px;
+  border-radius:6px;
+  margin:10px 0;
+}
+.success{background:#e8f7e8;color:#176b17}
+.error{background:#ffe8e8;color:#a00000}
+.product,.order{
+  border:1px solid #ddd;
+  padding:18px;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+.product{
+  display:flex;
+  gap:20px;
+  align-items:center;
+}
+.product img{
+  width:100px;
+  height:100px;
+  object-fit:cover;
+  border-radius:7px;
+}
+.actions{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.logout{
+  float:right;
+}
+small{color:#666}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+
+<div id="loginBox" class="card">
+
+<h1>Admin Login</h1>
+
+<p>Login to manage your store.</p>
+
+<input
+  type="email"
+  id="loginEmail"
+  placeholder="Admin Email"
+>
+
+<input
+  type="password"
+  id="loginPassword"
+  placeholder="Password"
+>
+
+<button onclick="login()">Login</button>
+
+<div id="loginMessage"></div>
+
+</div>
+
+
+<!-- ADMIN -->
+
+<div id="adminPanel" class="hidden">
+
+<div class="card">
+
+<button class="logout" onclick="logout()">Logout</button>
+
+<h1>My Store Admin</h1>
+
+<p>Manage products and orders.</p>
+
+</div>
+
+
+<!-- ADD PRODUCT -->
+
+<div class="card">
+
+<h2>Add Product</h2>
+
+<form id="productForm">
+
+<input
+  type="text"
+  id="productName"
+  placeholder="Product Name"
+  required
+>
+
+<input
+  type="text"
+  id="productSlug"
+  placeholder="Product Slug e.g. black-shoes"
+  required
+>
+
+<input
+  type="number"
+  id="productPrice"
+  placeholder="Price"
+  min="0"
+  required
+>
+
+<textarea
+  id="productDescription"
+  placeholder="Product Description"
+></textarea>
+
+<input
+  type="number"
+  id="productStock"
+  placeholder="Stock"
+  min="0"
+  value="1"
+  required
+>
+
+<select id="productStatus">
+<option value="active">Active</option>
+<option value="inactive">Inactive</option>
+</select>
+
+<label><b>Product Image</b></label>
+
+<input
+  type="file"
+  id="productImage"
+  accept="image/*"
+>
+
+<button type="submit">
+Add Product
+</button>
+
+<div id="productMessage"></div>
+
+</form>
+
+</div>
+
+
+<!-- PRODUCTS -->
+
+<div class="card">
+
+<h2>Products</h2>
+
+<div id="productsList">
+Loading products...
+</div>
+
+</div>
+
+
+<!-- ORDERS -->
+
+<div class="card">
+
+<h2>Orders</h2>
+
+<div id="ordersList">
+Loading orders...
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ================================
+   SUPABASE
+================================ */
+
+const SUPABASE_URL =
+"https://qmchlafchuvldumxurbl.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* ================================
+   LOGIN
+================================ */
+
+async function login(){
+
+  const email =
+    document.getElementById("loginEmail").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+  const message =
+    document.getElementById("loginMessage");
+
+  message.innerHTML = "";
+
+  const { error } =
+    await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+
+    message.innerHTML =
+      `<div class="message error">
+       ${escapeHtml(error.message)}
+       </div>`;
+
+    return;
+  }
+
+  showAdmin();
+
+}
+
+
+/* ================================
+   LOGOUT
+================================ */
+
+async function logout(){
+
+  await db.auth.signOut();
+
+  document.getElementById("adminPanel")
+    .classList.add("hidden");
+
+  document.getElementById("loginBox")
+    .classList.remove("hidden");
+
+}
+
+
+/* ================================
+   CHECK LOGIN
+================================ */
+
+async function checkLogin(){
+
+  const {
+    data:{session}
+  } = await db.auth.getSession();
+
+  if(session){
+
+    showAdmin();
+
+  }else{
+
+    document.getElementById("loginBox")
+      .classList.remove("hidden");
+
+  }
+
+}
+
+
+/* ================================
+   SHOW ADMIN
+================================ */
+
+function showAdmin(){
+
+  document.getElementById("loginBox")
+    .classList.add("hidden");
+
+  document.getElementById("adminPanel")
+    .classList.remove("hidden");
+
+  loadProducts();
+
+  loadOrders();
+
+}
+
+
+/* ================================
+   ADD PRODUCT
+================================ */
+
+document.getElementById("productForm")
+.addEventListener("submit", async function(e){
+
+  e.preventDefault();
+
+  const message =
+    document.getElementById("productMessage");
+
+  message.innerHTML =
+    '<div class="message">Adding product...</div>';
+
+  const name =
+    document.getElementById("productName").value.trim();
+
+  const slug =
+    document.getElementById("productSlug").value.trim();
+
+  const price =
+    Number(document.getElementById("productPrice").value);
+
+  const description =
+    document.getElementById("productDescription").value.trim();
+
+  const stock =
+    Number(document.getElementById("productStock").value);
+
+  const status =
+    document.getElementById("productStatus").value;
+
+  const imageFile =
+    document.getElementById("productImage").files[0];
+
+  let imageUrl = null;
+
+
+  /* IMAGE UPLOAD */
+
+  if(imageFile){
+
+    const fileName =
+      Date.now() + "-" +
+      imageFile.name.replace(/\s+/g,"-");
+
+    const { error:uploadError } =
+      await db.storage
+        .from("product-images")
+        .upload(fileName,imageFile);
+
+    if(uploadError){
+
+      message.innerHTML =
+        `<div class="message error">
+        Image upload failed: ${escapeHtml(uploadError.message)}
+        </div>`;
+
+      return;
+    }
+
+    const { data:urlData } =
+      db.storage
+        .from("product-images")
+        .getPublicUrl(fileName);
+
+    imageUrl =
+      urlData.publicUrl;
+
+  }
+
+
+  /* INSERT PRODUCT */
+
+  const { error } =
+    await db
+      .from("products")
+      .insert([{
+
+        name:name,
+        slug:slug,
+        price:price,
+        description:description,
+        image_url:imageUrl,
+        stock:stock,
+        status:status
+
+      }]);
+
+
+  if(error){
+
+    message.innerHTML =
+      `<div class="message error">
+      ${escapeHtml(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  message.innerHTML =
+    `<div class="message success">
+    ✅ Product added successfully!
+    </div>`;
+
+  document.getElementById("productForm").reset();
+
+  loadProducts();
+
+});
+
+
+/* ================================
+   LOAD PRODUCTS
+================================ */
+
+async function loadProducts(){
+
+  const list =
+    document.getElementById("productsList");
+
+  list.innerHTML = "Loading...";
+
+  const {data,error} =
+    await db
+      .from("products")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    list.innerHTML =
+      `<div class="message error">
+      ${escapeHtml(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data || data.length === 0){
+
+    list.innerHTML =
+      "<p>No products yet.</p>";
+
+    return;
+  }
+
+
+  list.innerHTML = "";
+
+
+  data.forEach(product => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "product";
+
+    const image =
+      product.image_url ||
+      "https://via.placeholder.com/100";
+
+
+    div.innerHTML = `
+
+      <img src="${image}" alt="Product">
+
+      <div style="flex:1">
+
+        <h3>
+          ${escapeHtml(product.name)}
+        </h3>
+
+        <p>
+          Price: Rs. ${Number(product.price).toLocaleString()}
+        </p>
+
+        <p>
+          Stock: ${product.stock}
+        </p>
+
+        <small>
+          Status: ${escapeHtml(product.status)}
+        </small>
+
+        <div class="actions">
+
+          <button
+            onclick="deleteProduct(${product.id})"
+            class="danger"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+/* ================================
+   DELETE PRODUCT
+================================ */
+
+async function deleteProduct(id){
+
+  if(!confirm("Delete this product?")){
+    return;
+  }
+
+  const {error} =
+    await db
+      .from("products")
+      .delete()
+      .eq("id",id);
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+  loadProducts();
+
+}
+
+
+/* ================================
+   LOAD ORDERS
+================================ */
+
+async function loadOrders(){
+
+  const list =
+    document.getElementById("ordersList");
+
+  list.innerHTML = "Loading orders...";
+
+
+  const {data,error} =
+    await db
+      .from("orders")
+      .select("*")
+      .order("created_at",{ascending:false});
+
+
+  if(error){
+
+    list.innerHTML =
+      `<div class="message error">
+      ${escapeHtml(error.message)}
+      </div>`;
+
+    return;
+  }
+
+
+  if(!data || data.length === 0){
+
+    list.innerHTML =
+      "<p>No orders yet.</p>";
+
+    return;
+  }
+
+
+  list.innerHTML = "";
+
+
+  data.forEach(order => {
+
+    const div =
+      document.createElement("div");
+
+    div.className = "order";
+
+
+    div.innerHTML = `
+
+      <h3>
+        Order #${order.id}
+      </h3>
+
+      <p>
+        <b>Customer:</b>
+        ${escapeHtml(order.customer_name)}
+      </p>
+
+      <p>
+        <b>Phone:</b>
+        ${escapeHtml(order.phone)}
+      </p>
+
+      <p>
+        <b>Address:</b>
+        ${escapeHtml(order.address)}
+      </p>
+
+      <p>
+        <b>City:</b>
+        ${escapeHtml(order.city || "")}
+      </p>
+
+      <p>
+        <b>Quantity:</b>
+        ${order.quantity}
+      </p>
+
+      <p>
+        <b>Note:</b>
+        ${escapeHtml(order.note || "")}
+      </p>
+
+      <p>
+        <b>Current Status:</b>
+        ${escapeHtml(order.status)}
+      </p>
+
+      <select
+        onchange="updateOrderStatus(${order.id},this.value)"
+      >
+
+        <option value="pending"
+          ${order.status==="pending"?"selected":""}>
+          Pending
+        </option>
+
+        <option value="confirmed"
+          ${order.status==="confirmed"?"selected":""}>
+          Confirmed
+        </option>
+
+        <option value="shipped"
+          ${order.status==="shipped"?"selected":""}>
+          Shipped
+        </option>
+
+        <option value="delivered"
+          ${order.status==="delivered"?"selected":""}>
+          Delivered
+        </option>
+
+        <option value="cancelled"
+          ${order.status==="cancelled"?"selected":""}>
+          Cancelled
+        </option>
+
+      </select>
+
+    `;
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+/* ================================
+   UPDATE ORDER STATUS
+================================ */
+
+async function updateOrderStatus(id,status){
+
+  const {error} =
+    await db
+      .from("orders")
+      .update({status:status})
+      .eq("id",id);
+
+  if(error){
+
+    alert(error.message);
+
+    return;
+  }
+
+  loadOrders();
+
+}
+
+
+/* ================================
+   ESCAPE HTML
+================================ */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* ================================
+   START
+================================ */
+
+checkLogin();
+
+</script>
+
+</body>
+</html>
