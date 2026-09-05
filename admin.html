@@ -1,227 +1,1079 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Store - Admin</title>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>My Store Admin</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
-  font-family:Arial,sans-serif;
-  background:#f5f5f5;
-  color:#222;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f6f6f7;
+  color:#202223;
 }
-.container{
-  max-width:1100px;
-  margin:auto;
-  padding:25px;
+
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+  position:fixed;
+  left:0;
+  top:0;
+  width:240px;
+  height:100vh;
+  background:#111;
+  color:white;
+  padding:25px 15px;
+  z-index:1000;
 }
-.card{
-  background:white;
-  padding:25px;
-  border-radius:12px;
-  margin-bottom:20px;
-  box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+.brand{
+  font-size:24px;
+  font-weight:bold;
+  padding:0 12px 30px;
 }
-h1,h2{margin-top:0}
-input,textarea,select{
+
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.menu button{
   width:100%;
-  padding:12px;
-  margin:7px 0 15px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:15px;
+  text-align:left;
+  border:0;
+  background:transparent;
+  color:#ddd;
+  padding:13px 14px;
+  border-radius:7px;
+  cursor:pointer;
+  font-size:14px;
 }
-textarea{min-height:100px}
-button{
+
+.menu button:hover,
+.menu button.active{
+  background:#333;
+  color:white;
+}
+
+
+/* ================= MAIN ================= */
+
+.main{
+  margin-left:240px;
+  min-height:100vh;
+}
+
+
+/* ================= TOPBAR ================= */
+
+.topbar{
+  height:70px;
+  background:white;
+  border-bottom:1px solid #ddd;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
+  position:sticky;
+  top:0;
+  z-index:900;
+}
+
+.topbar h2{
+  margin:0;
+  font-size:20px;
+}
+
+.logout{
   background:#111;
   color:white;
   border:0;
-  padding:12px 20px;
+  padding:10px 16px;
   border-radius:6px;
   cursor:pointer;
 }
-button:hover{opacity:.85}
-button.danger{background:#c62828}
-button.secondary{background:#555}
-.hidden{display:none}
+
+
+/* ================= CONTENT ================= */
+
+.content{
+  padding:30px;
+  max-width:1400px;
+  margin:auto;
+}
+
+
+/* ================= LOGIN ================= */
+
+.login-page{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f4f4f5;
+}
+
+.login-card{
+  background:white;
+  width:420px;
+  max-width:92%;
+  padding:35px;
+  border-radius:14px;
+  box-shadow:0 5px 25px rgba(0,0,0,.10);
+}
+
+.login-card h1{
+  margin-top:0;
+  margin-bottom:8px;
+}
+
+.login-card p{
+  color:#777;
+  margin-bottom:25px;
+}
+
+
+/* ================= INPUTS ================= */
+
+input,
+textarea,
+select{
+  width:100%;
+  border:1px solid #ccc;
+  background:white;
+  padding:12px;
+  border-radius:7px;
+  font-size:14px;
+  outline:none;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:#111;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.form-group{
+  margin-bottom:17px;
+}
+
+
+/* ================= BUTTONS ================= */
+
+.btn{
+  border:0;
+  background:#111;
+  color:white;
+  padding:11px 17px;
+  border-radius:7px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.btn:hover{
+  opacity:.85;
+}
+
+.btn-danger{
+  background:#c62828;
+}
+
+.btn-light{
+  background:#eee;
+  color:#222;
+}
+
+
+/* ================= DASHBOARD CARDS ================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:
+    repeat(4,minmax(0,1fr));
+  gap:18px;
+  margin-bottom:25px;
+}
+
+.stat{
+  background:white;
+  border:1px solid #e5e5e5;
+  border-radius:12px;
+  padding:22px;
+}
+
+.stat-title{
+  color:#777;
+  font-size:13px;
+  margin-bottom:10px;
+}
+
+.stat-number{
+  font-size:30px;
+  font-weight:bold;
+}
+
+
+/* ================= CARD ================= */
+
+.card{
+  background:white;
+  border:1px solid #e5e5e5;
+  border-radius:12px;
+  padding:24px;
+  margin-bottom:22px;
+}
+
+.card-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.card-header h2{
+  margin:0;
+  font-size:20px;
+}
+
+
+/* ================= PRODUCT FORM ================= */
+
+.form-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.image-preview{
+  width:130px;
+  height:130px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid #ddd;
+  margin-top:10px;
+  display:none;
+}
+
+
+/* ================= PRODUCTS ================= */
+
+.search-row{
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.search-row input{
+  flex:1;
+}
+
+.product-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(3,minmax(0,1fr));
+  gap:18px;
+}
+
+.product-card{
+  border:1px solid #ddd;
+  border-radius:10px;
+  overflow:hidden;
+  background:white;
+}
+
+.product-card img{
+  width:100%;
+  height:210px;
+  object-fit:cover;
+  background:#eee;
+}
+
+.product-body{
+  padding:16px;
+}
+
+.product-body h3{
+  margin:0 0 8px;
+  font-size:17px;
+}
+
+.product-price{
+  font-weight:bold;
+  font-size:18px;
+  margin-bottom:7px;
+}
+
+.product-meta{
+  color:#777;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:5px;
+  font-size:11px;
+  font-weight:bold;
+  background:#eee;
+}
+
+.badge-active{
+  background:#e6f5e9;
+  color:#176b2c;
+}
+
+.badge-inactive{
+  background:#ffe9e9;
+  color:#a00000;
+}
+
+.actions{
+  display:flex;
+  gap:7px;
+  margin-top:14px;
+}
+
+.actions button{
+  flex:1;
+}
+
+
+/* ================= ORDERS ================= */
+
+.order{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:18px;
+  margin-bottom:14px;
+}
+
+.order-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin-bottom:14px;
+}
+
+.order-top h3{
+  margin:0;
+}
+
+.order-info{
+  display:grid;
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
+  gap:8px;
+  font-size:14px;
+  color:#555;
+}
+
+.order-status{
+  margin-top:15px;
+}
+
+
+/* ================= MESSAGES ================= */
+
 .message{
   padding:12px;
-  border-radius:6px;
-  margin:10px 0;
-}
-.success{background:#e8f7e8;color:#176b17}
-.error{background:#ffe8e8;color:#a00000}
-.product,.order{
-  border:1px solid #ddd;
-  padding:18px;
-  border-radius:8px;
-  margin-bottom:15px;
-}
-.product{
-  display:flex;
-  gap:20px;
-  align-items:center;
-}
-.product img{
-  width:100px;
-  height:100px;
-  object-fit:cover;
   border-radius:7px;
-}
-.actions{
   margin-top:12px;
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
+  font-size:14px;
 }
-.logout{
-  float:right;
+
+.success{
+  background:#e8f7e8;
+  color:#176b17;
 }
-small{color:#666}
+
+.error{
+  background:#ffe8e8;
+  color:#a00000;
+}
+
+
+/* ================= SECTIONS ================= */
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+
+/* ================= MOBILE ================= */
+
+.mobile-menu{
+  display:none;
+}
+
+@media(max-width:1000px){
+
+  .product-grid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .stats{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+}
+
+@media(max-width:700px){
+
+  .sidebar{
+    width:220px;
+    transform:translateX(-100%);
+    transition:.2s;
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .mobile-menu{
+    display:block;
+    background:#111;
+    color:white;
+    border:0;
+    padding:9px 12px;
+    border-radius:6px;
+  }
+
+  .topbar{
+    padding:0 15px;
+  }
+
+  .content{
+    padding:18px;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .full{
+    grid-column:auto;
+  }
+
+  .product-grid{
+    grid-template-columns:1fr;
+  }
+
+  .order-info{
+    grid-template-columns:1fr;
+  }
+
+  .search-row{
+    display:block;
+  }
+
+  .search-row input{
+    margin-bottom:10px;
+  }
+
+}
+
+@media(max-width:450px){
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  .card{
+    padding:17px;
+  }
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
-<div class="container">
 
-<!-- LOGIN -->
+<!-- ================= LOGIN ================= -->
 
-<div id="loginBox" class="card">
+<div id="loginPage" class="login-page">
 
-<h1>Admin Login</h1>
+  <div class="login-card">
 
-<p>Login to manage your store.</p>
+    <h1>My Store</h1>
 
-<input
-  type="email"
-  id="loginEmail"
-  placeholder="Admin Email"
->
+    <p>
+      Admin Dashboard
+    </p>
 
-<input
-  type="password"
-  id="loginPassword"
-  placeholder="Password"
->
+    <div class="form-group">
 
-<button onclick="login()">Login</button>
+      <label>Email</label>
 
-<div id="loginMessage"></div>
+      <input
+        type="email"
+        id="loginEmail"
+        placeholder="Admin email"
+      >
 
-</div>
+    </div>
 
+    <div class="form-group">
 
-<!-- ADMIN -->
+      <label>Password</label>
 
-<div id="adminPanel" class="hidden">
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Password"
+      >
 
-<div class="card">
+    </div>
 
-<button class="logout" onclick="logout()">Logout</button>
+    <button
+      class="btn"
+      style="width:100%"
+      onclick="login()"
+    >
+      Login
+    </button>
 
-<h1>My Store Admin</h1>
+    <div id="loginMessage"></div>
 
-<p>Manage products and orders.</p>
-
-</div>
-
-
-<!-- ADD PRODUCT -->
-
-<div class="card">
-
-<h2>Add Product</h2>
-
-<form id="productForm">
-
-<input
-  type="text"
-  id="productName"
-  placeholder="Product Name"
-  required
->
-
-<input
-  type="text"
-  id="productSlug"
-  placeholder="Product Slug e.g. black-shoes"
-  required
->
-
-<input
-  type="number"
-  id="productPrice"
-  placeholder="Price"
-  min="0"
-  required
->
-
-<textarea
-  id="productDescription"
-  placeholder="Product Description"
-></textarea>
-
-<input
-  type="number"
-  id="productStock"
-  placeholder="Stock"
-  min="0"
-  value="1"
-  required
->
-
-<select id="productStatus">
-<option value="active">Active</option>
-<option value="inactive">Inactive</option>
-</select>
-
-<label><b>Product Image</b></label>
-
-<input
-  type="file"
-  id="productImage"
-  accept="image/*"
->
-
-<button type="submit">
-Add Product
-</button>
-
-<div id="productMessage"></div>
-
-</form>
+  </div>
 
 </div>
 
 
-<!-- PRODUCTS -->
+<!-- ================= ADMIN ================= -->
 
-<div class="card">
+<div id="adminApp" style="display:none">
 
-<h2>Products</h2>
 
-<div id="productsList">
-Loading products...
+<!-- SIDEBAR -->
+
+<aside class="sidebar" id="sidebar">
+
+  <div class="brand">
+    My Store
+  </div>
+
+  <div class="menu">
+
+    <button
+      class="active"
+      onclick="showSection('dashboard',this)"
+    >
+      📊 Dashboard
+    </button>
+
+    <button
+      onclick="showSection('products',this)"
+    >
+      🛍️ Products
+    </button>
+
+    <button
+      onclick="showSection('addProduct',this)"
+    >
+      ➕ Add Product
+    </button>
+
+    <button
+      onclick="showSection('orders',this)"
+    >
+      📋 Orders
+    </button>
+
+  </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+
+<!-- TOPBAR -->
+
+<div class="topbar">
+
+  <div style="display:flex;align-items:center;gap:12px">
+
+    <button
+      class="mobile-menu"
+      onclick="toggleSidebar()"
+    >
+      ☰
+    </button>
+
+    <h2 id="pageTitle">
+      Dashboard
+    </h2>
+
+  </div>
+
+  <button
+    class="logout"
+    onclick="logout()"
+  >
+    Logout
+  </button>
+
 </div>
 
-</div>
+
+<div class="content">
 
 
-<!-- ORDERS -->
+<!-- ================= DASHBOARD ================= -->
 
-<div class="card">
+<section
+  id="dashboard"
+  class="section active"
+>
 
-<h2>Orders</h2>
+  <div class="stats">
 
-<div id="ordersList">
-Loading orders...
-</div>
+    <div class="stat">
+
+      <div class="stat-title">
+        Total Products
+      </div>
+
+      <div
+        class="stat-number"
+        id="totalProducts"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-title">
+        Active Products
+      </div>
+
+      <div
+        class="stat-number"
+        id="activeProducts"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-title">
+        Total Orders
+      </div>
+
+      <div
+        class="stat-number"
+        id="totalOrders"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="stat-title">
+        Pending Orders
+      </div>
+
+      <div
+        class="stat-number"
+        id="pendingOrders"
+      >
+        0
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <h2>
+        Recent Orders
+      </h2>
+
+      <button
+        class="btn btn-light"
+        onclick="showSectionByName('orders')"
+      >
+        View All
+      </button>
+
+    </div>
+
+    <div id="recentOrders">
+      Loading...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= PRODUCTS ================= -->
+
+<section
+  id="products"
+  class="section"
+>
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <h2>
+        Products
+      </h2>
+
+      <button
+        class="btn"
+        onclick="showSectionByName('addProduct')"
+      >
+        + Add Product
+      </button>
+
+    </div>
+
+
+    <div class="search-row">
+
+      <input
+        type="search"
+        id="productSearch"
+        placeholder="🔎 Search products..."
+        oninput="renderProducts()"
+      >
+
+      <select
+        id="productFilter"
+        onchange="renderProducts()"
+        style="max-width:220px"
+      >
+
+        <option value="all">
+          All Products
+        </option>
+
+        <option value="active">
+          Active
+        </option>
+
+        <option value="inactive">
+          Inactive
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div
+      id="productsList"
+      class="product-grid"
+    >
+      Loading...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= ADD / EDIT ================= -->
+
+<section
+  id="addProduct"
+  class="section"
+>
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <h2 id="formTitle">
+        Add Product
+      </h2>
+
+      <button
+        class="btn btn-light"
+        onclick="resetProductForm()"
+      >
+        Clear
+      </button>
+
+    </div>
+
+
+    <form id="productForm">
+
+      <input
+        type="hidden"
+        id="editProductId"
+      >
+
+
+      <div class="form-grid">
+
+
+        <div class="form-group">
+
+          <label>
+            Product Name *
+          </label>
+
+          <input
+            type="text"
+            id="productName"
+            placeholder="Example: Black Watch"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Product Slug *
+          </label>
+
+          <input
+            type="text"
+            id="productSlug"
+            placeholder="black-watch"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Price (PKR) *
+          </label>
+
+          <input
+            type="number"
+            id="productPrice"
+            min="0"
+            placeholder="1500"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Stock *
+          </label>
+
+          <input
+            type="number"
+            id="productStock"
+            min="0"
+            value="1"
+            required
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Category
+          </label>
+
+          <input
+            type="text"
+            id="productCategory"
+            placeholder="Watches, Shoes, Electronics..."
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Status
+          </label>
+
+          <select id="productStatus">
+
+            <option value="active">
+              Active
+            </option>
+
+            <option value="inactive">
+              Inactive
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div class="form-group full">
+
+          <label>
+            Product Description
+          </label>
+
+          <textarea
+            id="productDescription"
+            placeholder="Write product details..."
+          ></textarea>
+
+        </div>
+
+
+        <div class="form-group full">
+
+          <label>
+            Product Image
+          </label>
+
+          <input
+            type="file"
+            id="productImage"
+            accept="image/*"
+            onchange="previewImage()"
+          >
+
+          <img
+            id="imagePreview"
+            class="image-preview"
+            alt="Preview"
+          >
+
+        </div>
+
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="btn"
+        id="saveProductButton"
+      >
+        Add Product
+      </button>
+
+
+      <div id="productMessage"></div>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+<!-- ================= ORDERS ================= -->
+
+<section
+  id="orders"
+  class="section"
+>
+
+  <div class="card">
+
+    <div class="card-header">
+
+      <h2>
+        Orders
+      </h2>
+
+      <button
+        class="btn btn-light"
+        onclick="loadOrders()"
+      >
+        Refresh
+      </button>
+
+    </div>
+
+
+    <div id="ordersList">
+      Loading orders...
+    </div>
+
+  </div>
+
+</section>
+
 
 </div>
 
@@ -232,112 +1084,134 @@ Loading orders...
 
 <script>
 
-/* ================================
+/* =====================================
    SUPABASE
-================================ */
+===================================== */
 
 const SUPABASE_URL =
-"https://qmchlafchuvldumxurbl.supabase.co";
+  "https://qmchlafchuvldumxurbl.supabase.co";
 
 const SUPABASE_KEY =
-"sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
+  "sb_publishable_WXqvOXVXfmojAFPOG74SQw_fvurPlBB";
 
-const db = supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+const db =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
-/* ================================
+let allProducts = [];
+
+let allOrders = [];
+
+
+/* =====================================
    LOGIN
-================================ */
+===================================== */
 
 async function login(){
 
   const email =
-    document.getElementById("loginEmail").value.trim();
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
 
   const password =
-    document.getElementById("loginPassword").value;
+    document
+      .getElementById("loginPassword")
+      .value;
 
   const message =
-    document.getElementById("loginMessage");
+    document.getElementById(
+      "loginMessage"
+    );
 
-  message.innerHTML = "";
+  message.innerHTML =
+    "";
 
-  const { error } =
+
+  const {error} =
     await db.auth.signInWithPassword({
+
       email,
       password
+
     });
+
 
   if(error){
 
-    message.innerHTML =
-      `<div class="message error">
-       ${escapeHtml(error.message)}
-       </div>`;
+    message.innerHTML = `
+      <div class="message error">
+        ${escapeHtml(error.message)}
+      </div>
+    `;
 
     return;
   }
+
 
   showAdmin();
 
 }
 
 
-/* ================================
+/* =====================================
    LOGOUT
-================================ */
+===================================== */
 
 async function logout(){
 
   await db.auth.signOut();
 
-  document.getElementById("adminPanel")
-    .classList.add("hidden");
+  document.getElementById(
+    "adminApp"
+  ).style.display = "none";
 
-  document.getElementById("loginBox")
-    .classList.remove("hidden");
+  document.getElementById(
+    "loginPage"
+  ).style.display = "flex";
 
 }
 
 
-/* ================================
+/* =====================================
    CHECK LOGIN
-================================ */
+===================================== */
 
 async function checkLogin(){
 
   const {
     data:{session}
-  } = await db.auth.getSession();
+  } =
+    await db.auth.getSession();
+
 
   if(session){
 
     showAdmin();
-
-  }else{
-
-    document.getElementById("loginBox")
-      .classList.remove("hidden");
 
   }
 
 }
 
 
-/* ================================
+/* =====================================
    SHOW ADMIN
-================================ */
+===================================== */
 
 function showAdmin(){
 
-  document.getElementById("loginBox")
-    .classList.add("hidden");
+  document.getElementById(
+    "loginPage"
+  ).style.display = "none";
 
-  document.getElementById("adminPanel")
-    .classList.remove("hidden");
+  document.getElementById(
+    "adminApp"
+  ).style.display = "block";
+
 
   loadProducts();
 
@@ -346,200 +1220,615 @@ function showAdmin(){
 }
 
 
-/* ================================
-   ADD PRODUCT
-================================ */
+/* =====================================
+   SECTION NAVIGATION
+===================================== */
 
-document.getElementById("productForm")
-.addEventListener("submit", async function(e){
+function showSection(name,button){
 
-  e.preventDefault();
+  document
+    .querySelectorAll(".section")
+    .forEach(section => {
 
-  const message =
-    document.getElementById("productMessage");
+      section.classList.remove(
+        "active"
+      );
 
-  message.innerHTML =
-    '<div class="message">Adding product...</div>';
-
-  const name =
-    document.getElementById("productName").value.trim();
-
-  const slug =
-    document.getElementById("productSlug").value.trim();
-
-  const price =
-    Number(document.getElementById("productPrice").value);
-
-  const description =
-    document.getElementById("productDescription").value.trim();
-
-  const stock =
-    Number(document.getElementById("productStock").value);
-
-  const status =
-    document.getElementById("productStatus").value;
-
-  const imageFile =
-    document.getElementById("productImage").files[0];
-
-  let imageUrl = null;
+    });
 
 
-  /* IMAGE UPLOAD */
+  document
+    .getElementById(name)
+    .classList.add("active");
 
-  if(imageFile){
 
-    const fileName =
-      Date.now() + "-" +
-      imageFile.name.replace(/\s+/g,"-");
+  document
+    .querySelectorAll(".menu button")
+    .forEach(btn => {
 
-    const { error:uploadError } =
-      await db.storage
-        .from("product-images")
-        .upload(fileName,imageFile);
+      btn.classList.remove("active");
 
-    if(uploadError){
+    });
+
+
+  if(button){
+
+    button.classList.add("active");
+
+  }
+
+
+  const titles = {
+
+    dashboard:"Dashboard",
+
+    products:"Products",
+
+    addProduct:"Add Product",
+
+    orders:"Orders"
+
+  };
+
+
+  document.getElementById(
+    "pageTitle"
+  ).textContent =
+    titles[name] || "Admin";
+
+
+  document
+    .getElementById("sidebar")
+    .classList.remove("open");
+
+}
+
+
+function showSectionByName(name){
+
+  const button =
+    [...document.querySelectorAll(
+      ".menu button"
+    )]
+    .find(btn =>
+      btn.getAttribute("onclick")
+      ?.includes(
+        `'${name}'`
+      )
+    );
+
+
+  showSection(name,button);
+
+}
+
+
+function toggleSidebar(){
+
+  document
+    .getElementById("sidebar")
+    .classList.toggle("open");
+
+}
+
+
+/* =====================================
+   ADD / EDIT PRODUCT
+===================================== */
+
+document
+  .getElementById("productForm")
+  .addEventListener(
+    "submit",
+    async function(e){
+
+      e.preventDefault();
+
+
+      const message =
+        document.getElementById(
+          "productMessage"
+        );
+
+
+      const editId =
+        document.getElementById(
+          "editProductId"
+        ).value;
+
+
+      const name =
+        document.getElementById(
+          "productName"
+        ).value.trim();
+
+
+      const slug =
+        document.getElementById(
+          "productSlug"
+        ).value.trim()
+        .toLowerCase()
+        .replace(/\s+/g,"-");
+
+
+      const price =
+        Number(
+          document.getElementById(
+            "productPrice"
+          ).value
+        );
+
+
+      const stock =
+        Number(
+          document.getElementById(
+            "productStock"
+          ).value
+        );
+
+
+      const category =
+        document.getElementById(
+          "productCategory"
+        ).value.trim()
+        || "General";
+
+
+      const status =
+        document.getElementById(
+          "productStatus"
+        ).value;
+
+
+      const description =
+        document.getElementById(
+          "productDescription"
+        ).value.trim();
+
+
+      const imageFile =
+        document.getElementById(
+          "productImage"
+        ).files[0];
+
 
       message.innerHTML =
-        `<div class="message error">
-        Image upload failed: ${escapeHtml(uploadError.message)}
+        `<div class="message">
+          Saving product...
         </div>`;
 
-      return;
-    }
 
-    const { data:urlData } =
-      db.storage
-        .from("product-images")
-        .getPublicUrl(fileName);
-
-    imageUrl =
-      urlData.publicUrl;
-
-  }
+      let imageUrl = null;
 
 
-  /* INSERT PRODUCT */
+      /* EDIT: KEEP OLD IMAGE */
 
-  const { error } =
-    await db
-      .from("products")
-      .insert([{
+      if(editId){
+
+        const oldProduct =
+          allProducts.find(
+            p =>
+              String(p.id) ===
+              String(editId)
+          );
+
+        imageUrl =
+          oldProduct?.image_url ||
+          null;
+
+      }
+
+
+      /* UPLOAD NEW IMAGE */
+
+      if(imageFile){
+
+        const safeName =
+          imageFile.name
+            .replace(/[^a-zA-Z0-9._-]/g,"-");
+
+
+        const fileName =
+          Date.now() +
+          "-" +
+          safeName;
+
+
+        const {
+          error:uploadError
+        } =
+          await db.storage
+            .from("product-images")
+            .upload(
+              fileName,
+              imageFile
+            );
+
+
+        if(uploadError){
+
+          message.innerHTML = `
+            <div class="message error">
+              Image upload failed:
+              ${escapeHtml(
+                uploadError.message
+              )}
+            </div>
+          `;
+
+          return;
+        }
+
+
+        const {data:urlData} =
+          db.storage
+            .from("product-images")
+            .getPublicUrl(
+              fileName
+            );
+
+
+        imageUrl =
+          urlData.publicUrl;
+
+      }
+
+
+      const productData = {
 
         name:name,
+
         slug:slug,
+
         price:price,
+
         description:description,
+
         image_url:imageUrl,
+
         stock:stock,
-        status:status
 
-      }]);
+        status:status,
+
+        category:category
+
+      };
 
 
-  if(error){
+      let result;
 
-    message.innerHTML =
-      `<div class="message error">
-      ${escapeHtml(error.message)}
-      </div>`;
+
+      /* EDIT */
+
+      if(editId){
+
+        result =
+          await db
+            .from("products")
+            .update(productData)
+            .eq("id",editId);
+
+      }
+
+      /* ADD */
+
+      else{
+
+        result =
+          await db
+            .from("products")
+            .insert([
+              productData
+            ]);
+
+      }
+
+
+      if(result.error){
+
+        message.innerHTML = `
+          <div class="message error">
+            ${escapeHtml(
+              result.error.message
+            )}
+          </div>
+        `;
+
+        return;
+      }
+
+
+      message.innerHTML = `
+        <div class="message success">
+          ✅ Product saved successfully!
+        </div>
+      `;
+
+
+      resetProductForm();
+
+      await loadProducts();
+
+
+      setTimeout(() => {
+
+        showSectionByName(
+          "products"
+        );
+
+      },700);
+
+    }
+  );
+
+
+/* =====================================
+   IMAGE PREVIEW
+===================================== */
+
+function previewImage(){
+
+  const file =
+    document.getElementById(
+      "productImage"
+    ).files[0];
+
+  const preview =
+    document.getElementById(
+      "imagePreview"
+    );
+
+
+  if(!file){
+
+    preview.style.display =
+      "none";
 
     return;
+
   }
 
 
-  message.innerHTML =
-    `<div class="message success">
-    ✅ Product added successfully!
-    </div>`;
+  preview.src =
+    URL.createObjectURL(file);
 
-  document.getElementById("productForm").reset();
+  preview.style.display =
+    "block";
 
-  loadProducts();
-
-});
+}
 
 
-/* ================================
+/* =====================================
+   RESET FORM
+===================================== */
+
+function resetProductForm(){
+
+  document
+    .getElementById("productForm")
+    .reset();
+
+
+  document.getElementById(
+    "editProductId"
+  ).value = "";
+
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "Add Product";
+
+
+  document.getElementById(
+    "saveProductButton"
+  ).textContent =
+    "Add Product";
+
+
+  document.getElementById(
+    "imagePreview"
+  ).style.display =
+    "none";
+
+
+  document.getElementById(
+    "productMessage"
+  ).innerHTML = "";
+
+}
+
+
+/* =====================================
    LOAD PRODUCTS
-================================ */
+===================================== */
 
 async function loadProducts(){
-
-  const list =
-    document.getElementById("productsList");
-
-  list.innerHTML = "Loading...";
 
   const {data,error} =
     await db
       .from("products")
       .select("*")
-      .order("created_at",{ascending:false});
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
 
 
   if(error){
 
-    list.innerHTML =
-      `<div class="message error">
-      ${escapeHtml(error.message)}
-      </div>`;
+    document.getElementById(
+      "productsList"
+    ).innerHTML = `
+      <div class="message error">
+        ${escapeHtml(
+          error.message
+        )}
+      </div>
+    `;
 
     return;
+
   }
 
 
-  if(!data || data.length === 0){
+  allProducts =
+    data || [];
 
-    list.innerHTML =
-      "<p>No products yet.</p>";
+
+  updateStats();
+
+  renderProducts();
+
+}
+
+
+/* =====================================
+   RENDER PRODUCTS
+===================================== */
+
+function renderProducts(){
+
+  const list =
+    document.getElementById(
+      "productsList"
+    );
+
+
+  const search =
+    document.getElementById(
+      "productSearch"
+    )
+    .value
+    .toLowerCase()
+    .trim();
+
+
+  const filter =
+    document.getElementById(
+      "productFilter"
+    ).value;
+
+
+  const filtered =
+    allProducts.filter(product => {
+
+      const matchesSearch =
+        (product.name || "")
+          .toLowerCase()
+          .includes(search);
+
+
+      const matchesFilter =
+        filter === "all" ||
+        product.status === filter;
+
+
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
+
+    });
+
+
+  if(filtered.length === 0){
+
+    list.innerHTML = `
+      <div
+        class="message"
+        style="grid-column:1/-1"
+      >
+        No products found.
+      </div>
+    `;
 
     return;
+
   }
 
 
   list.innerHTML = "";
 
 
-  data.forEach(product => {
+  filtered.forEach(product => {
 
     const div =
       document.createElement("div");
 
-    div.className = "product";
+
+    div.className =
+      "product-card";
+
 
     const image =
       product.image_url ||
-      "https://via.placeholder.com/100";
+      "https://via.placeholder.com/600x500?text=Product";
+
+
+    const statusClass =
+      product.status === "active"
+      ? "badge-active"
+      : "badge-inactive";
 
 
     div.innerHTML = `
 
-      <img src="${image}" alt="Product">
+      <img
+        src="${image}"
+        alt="${escapeHtml(
+          product.name
+        )}"
+      >
 
-      <div style="flex:1">
+      <div class="product-body">
+
+        <span
+          class="badge ${statusClass}"
+        >
+          ${escapeHtml(
+            product.status || "active"
+          )}
+        </span>
 
         <h3>
-          ${escapeHtml(product.name)}
+          ${escapeHtml(
+            product.name
+          )}
         </h3>
 
-        <p>
-          Price: Rs. ${Number(product.price).toLocaleString()}
-        </p>
+        <div class="product-price">
+          Rs.
+          ${Number(
+            product.price || 0
+          ).toLocaleString()}
+        </div>
 
-        <p>
-          Stock: ${product.stock}
-        </p>
-
-        <small>
-          Status: ${escapeHtml(product.status)}
-        </small>
+        <div class="product-meta">
+          Category:
+          ${escapeHtml(
+            product.category ||
+            "General"
+          )}
+          <br>
+          Stock:
+          ${product.stock || 0}
+        </div>
 
         <div class="actions">
 
           <button
+            class="btn"
+            onclick="editProduct(${product.id})"
+          >
+            Edit
+          </button>
+
+          <button
+            class="btn btn-danger"
             onclick="deleteProduct(${product.id})"
-            class="danger"
           >
             Delete
           </button>
@@ -550,6 +1839,7 @@ async function loadProducts(){
 
     `;
 
+
     list.appendChild(div);
 
   });
@@ -557,15 +1847,127 @@ async function loadProducts(){
 }
 
 
-/* ================================
+/* =====================================
+   EDIT PRODUCT
+===================================== */
+
+function editProduct(id){
+
+  const product =
+    allProducts.find(
+      p => Number(p.id) === Number(id)
+    );
+
+
+  if(!product) return;
+
+
+  document.getElementById(
+    "editProductId"
+  ).value =
+    product.id;
+
+
+  document.getElementById(
+    "productName"
+  ).value =
+    product.name || "";
+
+
+  document.getElementById(
+    "productSlug"
+  ).value =
+    product.slug || "";
+
+
+  document.getElementById(
+    "productPrice"
+  ).value =
+    product.price || 0;
+
+
+  document.getElementById(
+    "productStock"
+  ).value =
+    product.stock || 0;
+
+
+  document.getElementById(
+    "productCategory"
+  ).value =
+    product.category || "General";
+
+
+  document.getElementById(
+    "productStatus"
+  ).value =
+    product.status || "active";
+
+
+  document.getElementById(
+    "productDescription"
+  ).value =
+    product.description || "";
+
+
+  if(product.image_url){
+
+    const preview =
+      document.getElementById(
+        "imagePreview"
+      );
+
+    preview.src =
+      product.image_url;
+
+    preview.style.display =
+      "block";
+
+  }
+
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "Edit Product";
+
+
+  document.getElementById(
+    "saveProductButton"
+  ).textContent =
+    "Update Product";
+
+
+  showSectionByName(
+    "addProduct"
+  );
+
+}
+
+
+/* =====================================
    DELETE PRODUCT
-================================ */
+===================================== */
 
 async function deleteProduct(id){
 
-  if(!confirm("Delete this product?")){
-    return;
-  }
+  const product =
+    allProducts.find(
+      p => Number(p.id) === Number(id)
+    );
+
+
+  if(!product) return;
+
+
+  const confirmDelete =
+    confirm(
+      `Delete "${product.name}"?`
+    );
+
+
+  if(!confirmDelete) return;
+
 
   const {error} =
     await db
@@ -573,141 +1975,232 @@ async function deleteProduct(id){
       .delete()
       .eq("id",id);
 
+
   if(error){
 
     alert(error.message);
 
     return;
+
   }
 
-  loadProducts();
+
+  await loadProducts();
 
 }
 
 
-/* ================================
+/* =====================================
    LOAD ORDERS
-================================ */
+===================================== */
 
 async function loadOrders(){
 
   const list =
-    document.getElementById("ordersList");
-
-  list.innerHTML = "Loading orders...";
+    document.getElementById(
+      "ordersList"
+    );
 
 
   const {data,error} =
     await db
       .from("orders")
       .select("*")
-      .order("created_at",{ascending:false});
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
 
 
   if(error){
 
-    list.innerHTML =
-      `<div class="message error">
-      ${escapeHtml(error.message)}
-      </div>`;
+    list.innerHTML = `
+      <div class="message error">
+        ${escapeHtml(
+          error.message
+        )}
+      </div>
+    `;
 
     return;
+
   }
 
 
-  if(!data || data.length === 0){
+  allOrders =
+    data || [];
+
+
+  updateStats();
+
+  renderOrders();
+
+  renderRecentOrders();
+
+}
+
+
+/* =====================================
+   RENDER ORDERS
+===================================== */
+
+function renderOrders(){
+
+  const list =
+    document.getElementById(
+      "ordersList"
+    );
+
+
+  if(allOrders.length === 0){
 
     list.innerHTML =
       "<p>No orders yet.</p>";
 
     return;
+
   }
 
 
   list.innerHTML = "";
 
 
-  data.forEach(order => {
+  allOrders.forEach(order => {
 
     const div =
       document.createElement("div");
 
-    div.className = "order";
+
+    div.className =
+      "order";
 
 
     div.innerHTML = `
 
-      <h3>
-        Order #${order.id}
-      </h3>
+      <div class="order-top">
 
-      <p>
-        <b>Customer:</b>
-        ${escapeHtml(order.customer_name)}
-      </p>
+        <h3>
+          Order #${order.id}
+        </h3>
 
-      <p>
-        <b>Phone:</b>
-        ${escapeHtml(order.phone)}
-      </p>
+        <span class="badge">
+          ${escapeHtml(
+            order.status ||
+            "pending"
+          )}
+        </span>
 
-      <p>
-        <b>Address:</b>
-        ${escapeHtml(order.address)}
-      </p>
+      </div>
 
-      <p>
-        <b>City:</b>
-        ${escapeHtml(order.city || "")}
-      </p>
 
-      <p>
-        <b>Quantity:</b>
-        ${order.quantity}
-      </p>
+      <div class="order-info">
 
-      <p>
-        <b>Note:</b>
-        ${escapeHtml(order.note || "")}
-      </p>
+        <div>
+          <b>Customer:</b>
+          ${escapeHtml(
+            order.customer_name
+          )}
+        </div>
 
-      <p>
-        <b>Current Status:</b>
-        ${escapeHtml(order.status)}
-      </p>
+        <div>
+          <b>Phone:</b>
+          ${escapeHtml(
+            order.phone
+          )}
+        </div>
 
-      <select
-        onchange="updateOrderStatus(${order.id},this.value)"
-      >
+        <div>
+          <b>City:</b>
+          ${escapeHtml(
+            order.city || ""
+          )}
+        </div>
 
-        <option value="pending"
-          ${order.status==="pending"?"selected":""}>
-          Pending
-        </option>
+        <div>
+          <b>Quantity:</b>
+          ${order.quantity || 1}
+        </div>
 
-        <option value="confirmed"
-          ${order.status==="confirmed"?"selected":""}>
-          Confirmed
-        </option>
+        <div style="grid-column:1/-1">
+          <b>Address:</b>
+          ${escapeHtml(
+            order.address
+          )}
+        </div>
 
-        <option value="shipped"
-          ${order.status==="shipped"?"selected":""}>
-          Shipped
-        </option>
+        <div style="grid-column:1/-1">
+          <b>Note:</b>
+          ${escapeHtml(
+            order.note || "-"
+          )}
+        </div>
 
-        <option value="delivered"
-          ${order.status==="delivered"?"selected":""}>
-          Delivered
-        </option>
+      </div>
 
-        <option value="cancelled"
-          ${order.status==="cancelled"?"selected":""}>
-          Cancelled
-        </option>
 
-      </select>
+      <div class="order-status">
+
+        <label>
+          Update Order Status
+        </label>
+
+        <select
+          onchange="
+            updateOrderStatus(
+              ${order.id},
+              this.value
+            )
+          "
+        >
+
+          <option
+            value="pending"
+            ${order.status==="pending"
+              ?"selected":""}
+          >
+            Pending
+          </option>
+
+          <option
+            value="confirmed"
+            ${order.status==="confirmed"
+              ?"selected":""}
+          >
+            Confirmed
+          </option>
+
+          <option
+            value="shipped"
+            ${order.status==="shipped"
+              ?"selected":""}
+          >
+            Shipped
+          </option>
+
+          <option
+            value="delivered"
+            ${order.status==="delivered"
+              ?"selected":""}
+          >
+            Delivered
+          </option>
+
+          <option
+            value="cancelled"
+            ${order.status==="cancelled"
+              ?"selected":""}
+          >
+            Cancelled
+          </option>
+
+        </select>
+
+      </div>
 
     `;
+
 
     list.appendChild(div);
 
@@ -716,33 +2209,177 @@ async function loadOrders(){
 }
 
 
-/* ================================
-   UPDATE ORDER STATUS
-================================ */
+/* =====================================
+   RECENT ORDERS
+===================================== */
 
-async function updateOrderStatus(id,status){
+function renderRecentOrders(){
+
+  const list =
+    document.getElementById(
+      "recentOrders"
+    );
+
+
+  const recent =
+    allOrders.slice(0,5);
+
+
+  if(recent.length === 0){
+
+    list.innerHTML =
+      "<p>No orders yet.</p>";
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  recent.forEach(order => {
+
+    const div =
+      document.createElement("div");
+
+
+    div.className =
+      "order";
+
+
+    div.innerHTML = `
+
+      <div class="order-top">
+
+        <h3>
+          #${order.id}
+          —
+          ${escapeHtml(
+            order.customer_name
+          )}
+        </h3>
+
+        <span class="badge">
+          ${escapeHtml(
+            order.status ||
+            "pending"
+          )}
+        </span>
+
+      </div>
+
+      <div style="color:#777">
+
+        ${escapeHtml(
+          order.phone
+        )}
+        ·
+        ${escapeHtml(
+          order.city || ""
+        )}
+
+      </div>
+
+    `;
+
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+/* =====================================
+   UPDATE ORDER
+===================================== */
+
+async function updateOrderStatus(
+  id,
+  status
+){
 
   const {error} =
     await db
       .from("orders")
-      .update({status:status})
+      .update({
+        status:status
+      })
       .eq("id",id);
+
 
   if(error){
 
     alert(error.message);
 
     return;
+
   }
 
-  loadOrders();
+
+  await loadOrders();
 
 }
 
 
-/* ================================
+/* =====================================
+   STATS
+===================================== */
+
+function updateStats(){
+
+  const totalProducts =
+    allProducts.length;
+
+
+  const activeProducts =
+    allProducts.filter(
+      p => p.status === "active"
+    ).length;
+
+
+  const totalOrders =
+    allOrders.length;
+
+
+  const pendingOrders =
+    allOrders.filter(
+      o =>
+        !o.status ||
+        o.status === "pending"
+    ).length;
+
+
+  document.getElementById(
+    "totalProducts"
+  ).textContent =
+    totalProducts;
+
+
+  document.getElementById(
+    "activeProducts"
+  ).textContent =
+    activeProducts;
+
+
+  document.getElementById(
+    "totalOrders"
+  ).textContent =
+    totalOrders;
+
+
+  document.getElementById(
+    "pendingOrders"
+  ).textContent =
+    pendingOrders;
+
+}
+
+
+/* =====================================
    ESCAPE HTML
-================================ */
+===================================== */
 
 function escapeHtml(value){
 
@@ -756,13 +2393,14 @@ function escapeHtml(value){
 }
 
 
-/* ================================
+/* =====================================
    START
-================================ */
+===================================== */
 
 checkLogin();
 
 </script>
 
 </body>
+
 </html>
