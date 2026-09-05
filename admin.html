@@ -377,13 +377,19 @@ font-weight:700;
 margin-left:8px;
 }
 
-.preview{
+.preview-box{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:12px;
+}
+
+.preview-image{
 width:100px;
 height:100px;
 object-fit:cover;
 border-radius:8px;
-display:none;
-margin-top:10px;
+border:1px solid #ddd;
 }
 
 .order-customer{
@@ -581,9 +587,6 @@ id="loginMessage"
 
 <div class="admin" id="admin">
 
-
-<!-- SIDEBAR -->
-
 <aside class="sidebar">
 
 <div class="brand">
@@ -628,10 +631,7 @@ onclick="logout()"
 </aside>
 
 
-<!-- MAIN -->
-
 <main class="main">
-
 
 <div class="topbar">
 
@@ -668,78 +668,32 @@ id="dashboard"
 <div class="stats">
 
 <div class="stat">
-
-<div class="stat-title">
-Total Products
+<div class="stat-title">Total Products</div>
+<div class="stat-number" id="totalProducts">0</div>
 </div>
-
-<div
-class="stat-number"
-id="totalProducts"
->
-0
-</div>
-
-</div>
-
 
 <div class="stat">
-
-<div class="stat-title">
-Active Products
+<div class="stat-title">Active Products</div>
+<div class="stat-number" id="activeProducts">0</div>
 </div>
-
-<div
-class="stat-number"
-id="activeProducts"
->
-0
-</div>
-
-</div>
-
 
 <div class="stat">
-
-<div class="stat-title">
-Total Orders
+<div class="stat-title">Total Orders</div>
+<div class="stat-number" id="totalOrders">0</div>
 </div>
-
-<div
-class="stat-number"
-id="totalOrders"
->
-0
-</div>
-
-</div>
-
 
 <div class="stat">
-
-<div class="stat-title">
-Pending Orders
-</div>
-
-<div
-class="stat-number"
-id="pendingOrders"
->
-0
+<div class="stat-title">Pending Orders</div>
+<div class="stat-number" id="pendingOrders">0</div>
 </div>
 
 </div>
-
-</div>
-
 
 <div class="panel">
 
 <div class="panel-header">
 
-<h2>
-Recent Orders
-</h2>
+<h2>Recent Orders</h2>
 
 <button
 class="add-btn"
@@ -773,9 +727,7 @@ id="products"
 
 <div class="panel-header">
 
-<h2>
-All Products
-</h2>
+<h2>All Products</h2>
 
 <div>
 
@@ -838,9 +790,7 @@ id="editProductId"
 
 <div class="form-group">
 
-<label>
-Product Name *
-</label>
+<label>Product Name *</label>
 
 <input
 type="text"
@@ -854,9 +804,7 @@ required
 
 <div class="form-group">
 
-<label>
-Slug *
-</label>
+<label>Slug *</label>
 
 <input
 type="text"
@@ -870,9 +818,7 @@ required
 
 <div class="form-group">
 
-<label>
-Price *
-</label>
+<label>Price *</label>
 
 <input
 type="number"
@@ -887,9 +833,7 @@ required
 
 <div class="form-group">
 
-<label>
-Stock *
-</label>
+<label>Stock *</label>
 
 <input
 type="number"
@@ -904,9 +848,7 @@ required
 
 <div class="form-group">
 
-<label>
-Category
-</label>
+<label>Category</label>
 
 <input
 type="text"
@@ -919,19 +861,13 @@ placeholder="Watches"
 
 <div class="form-group">
 
-<label>
-Status
-</label>
+<label>Status</label>
 
 <select id="productStatus">
 
-<option value="active">
-Active
-</option>
+<option value="active">Active</option>
 
-<option value="inactive">
-Inactive
-</option>
+<option value="inactive">Inactive</option>
 
 </select>
 
@@ -940,9 +876,7 @@ Inactive
 
 <div class="form-group full">
 
-<label>
-Description
-</label>
+<label>Description</label>
 
 <textarea
 id="productDescription"
@@ -955,20 +889,24 @@ placeholder="Write product details..."
 <div class="form-group full">
 
 <label>
-Product Image
+Product Images — Multiple Photos
 </label>
 
 <input
 type="file"
-id="productImage"
+id="productImages"
 accept="image/*"
+multiple
 >
 
-<img
-id="imagePreview"
-class="preview"
-src=""
->
+<p style="margin-top:8px;color:#777;font-size:13px;">
+Select multiple pictures at once. The first picture will be the main product picture.
+</p>
+
+<div
+id="imagePreviewBox"
+class="preview-box"
+></div>
 
 </div>
 
@@ -1016,9 +954,7 @@ id="orders"
 
 <div class="panel-header">
 
-<h2>
-Customer Orders
-</h2>
+<h2>Customer Orders</h2>
 
 <input
 class="search"
@@ -1124,7 +1060,6 @@ SUPABASE_KEY
 /* DATA */
 
 let products = [];
-
 let orders = [];
 
 
@@ -1148,20 +1083,17 @@ document
 .getElementById("loginPassword")
 .value;
 
-
 const button =
 document.getElementById("loginBtn");
 
 button.disabled = true;
 button.textContent = "Logging in...";
 
-
 const {data,error} =
 await db.auth.signInWithPassword({
 email:email,
 password:password
 });
-
 
 if(error){
 
@@ -1177,7 +1109,6 @@ button.textContent = "Login";
 return;
 
 }
-
 
 showAdmin(data.user);
 
@@ -1242,42 +1173,33 @@ document
 page.classList.remove("active");
 });
 
-
 document
 .getElementById(pageId)
 .classList.add("active");
 
-
 document
-.querySelectorAll(".side-btn")
+.querySelectorAll(".sidebar .side-btn")
 .forEach(btn=>{
 btn.classList.remove("active");
 });
-
 
 if(button){
 button.classList.add("active");
 }
 
-
 const titles = {
 
 dashboard:"Dashboard",
-
 products:"Products",
-
 addProduct:"Add Product",
-
 orders:"Orders"
 
 };
-
 
 document
 .getElementById("pageTitle")
 .textContent =
 titles[pageId] || "Admin";
-
 
 if(pageId === "products"){
 renderProducts();
@@ -1299,26 +1221,39 @@ let button = null;
 
 buttons.forEach(btn=>{
 
-if(
+const text =
 btn.textContent
-.toLowerCase()
-.includes(
-pageId === "products"
-? "products"
-: pageId === "orders"
-? "orders"
-: pageId === "addProduct"
-? "add product"
-: "dashboard"
-)
+.toLowerCase();
+
+if(
+pageId === "products" &&
+text.includes("products")
 ){
-
 button = btn;
+}
 
+if(
+pageId === "orders" &&
+text.includes("orders")
+){
+button = btn;
+}
+
+if(
+pageId === "addProduct" &&
+text.includes("add product")
+){
+button = btn;
+}
+
+if(
+pageId === "dashboard" &&
+text.includes("dashboard")
+){
+button = btn;
 }
 
 });
-
 
 showPage(pageId,button);
 
@@ -1381,7 +1316,6 @@ await db
 {ascending:false}
 );
 
-
 if(error){
 
 console.error(error);
@@ -1415,7 +1349,6 @@ image_url
 {ascending:false}
 );
 
-
 if(error){
 
 console.error(error);
@@ -1438,7 +1371,6 @@ document
 .textContent =
 products.length;
 
-
 document
 .getElementById("activeProducts")
 .textContent =
@@ -1446,12 +1378,10 @@ products.filter(
 p => p.status === "active"
 ).length;
 
-
 document
 .getElementById("totalOrders")
 .textContent =
 orders.length;
-
 
 document
 .getElementById("pendingOrders")
@@ -1472,7 +1402,6 @@ document.getElementById("productsTable");
 
 if(!box) return;
 
-
 const search =
 (
 document
@@ -1481,14 +1410,12 @@ document
 )
 .toLowerCase();
 
-
 const filtered =
 products.filter(product=>
 (product.name || "")
 .toLowerCase()
 .includes(search)
 );
-
 
 if(filtered.length === 0){
 
@@ -1498,7 +1425,6 @@ box.innerHTML =
 return;
 
 }
-
 
 let html = `
 
@@ -1523,13 +1449,14 @@ let html = `
 <tbody>
 `;
 
-
 filtered.forEach(product=>{
 
-const image =
-product.image_url ||
-"https://via.placeholder.com/100?text=Product";
+const images =
+getProductImages(product);
 
+const image =
+images[0] ||
+"https://via.placeholder.com/100?text=Product";
 
 html += `
 
@@ -1540,18 +1467,29 @@ html += `
 <img
 class="product-thumb"
 src="${escapeHtml(image)}"
+onerror="this.src='https://via.placeholder.com/100?text=Product'"
 >
 
 </td>
 
 <td>
+
 <strong>
 ${escapeHtml(product.name)}
 </strong>
+
 <br>
+
 <small>
 ${escapeHtml(product.slug || "")}
 </small>
+
+<br>
+
+<small style="color:#777;">
+${images.length} image${images.length === 1 ? "" : "s"}
+</small>
+
 </td>
 
 <td>
@@ -1602,13 +1540,36 @@ Delete
 
 });
 
-
 html += `
 </tbody>
 </table>
 `;
 
 box.innerHTML = html;
+
+}
+
+
+/* GET PRODUCT IMAGES */
+
+function getProductImages(product){
+
+if(
+Array.isArray(product.image_urls) &&
+product.image_urls.length > 0
+){
+
+return product.image_urls.filter(Boolean);
+
+}
+
+if(product.image_url){
+
+return [product.image_url];
+
+}
+
+return [];
 
 }
 
@@ -1623,18 +1584,15 @@ async function(e){
 
 e.preventDefault();
 
-
 const id =
 document
 .getElementById("editProductId")
 .value;
 
-
 const name =
 document
 .getElementById("productName")
 .value.trim();
-
 
 const slug =
 document
@@ -1643,14 +1601,12 @@ document
 .toLowerCase()
 .replace(/\s+/g,"-");
 
-
 const price =
 Number(
 document
 .getElementById("productPrice")
 .value
 );
-
 
 const stock =
 Number(
@@ -1659,44 +1615,49 @@ document
 .value
 );
 
-
 const category =
 document
 .getElementById("productCategory")
 .value.trim()
 || "General";
 
-
 const status =
 document
 .getElementById("productStatus")
 .value;
 
-
-const description =
+let description =
 document
 .getElementById("productDescription")
 .value.trim();
 
+if(
+description === "/admin.html" ||
+description.toLowerCase() === "admin.html"
+){
 
-const imageFile =
+description = "";
+
+}
+
+
+const imageFiles =
+Array.from(
 document
-.getElementById("productImage")
-.files[0];
-
+.getElementById("productImages")
+.files
+);
 
 const button =
 document.getElementById("saveProductBtn");
-
 
 button.disabled = true;
 button.textContent = "Saving...";
 
 
-let imageUrl = "";
+/* EXISTING IMAGES */
 
-
-/* EXISTING IMAGE */
+let imageUrls = [];
 
 if(id){
 
@@ -1707,24 +1668,25 @@ p => String(p.id) === String(id)
 
 if(old){
 
-imageUrl =
-old.image_url || "";
+imageUrls =
+getProductImages(old);
 
 }
 
 }
 
 
-/* UPLOAD IMAGE */
+/* UPLOAD NEW IMAGES */
 
-if(imageFile){
+if(imageFiles.length > 0){
+
+for(const imageFile of imageFiles){
 
 const extension =
 imageFile.name
 .split(".")
 .pop()
 .toLowerCase();
-
 
 const fileName =
 Date.now() +
@@ -1735,11 +1697,9 @@ Math.random()
 "." +
 extension;
 
-
 const filePath =
 "products/" +
 fileName;
-
 
 const {error:uploadError} =
 await db.storage
@@ -1751,7 +1711,6 @@ imageFile,
 upsert:false
 }
 );
-
 
 if(uploadError){
 
@@ -1771,15 +1730,20 @@ return;
 
 }
 
-
 const {data:urlData} =
 db.storage
 .from("product-images")
 .getPublicUrl(filePath);
 
+if(urlData?.publicUrl){
 
-imageUrl =
-urlData.publicUrl;
+imageUrls.push(
+urlData.publicUrl
+);
+
+}
+
+}
 
 }
 
@@ -1802,10 +1766,13 @@ status:status,
 
 description:description,
 
-image_url:imageUrl
+image_url:
+imageUrls[0] || "",
+
+image_urls:
+imageUrls
 
 };
-
 
 let error;
 
@@ -1867,13 +1834,17 @@ id
 );
 
 
-resetProductForm();
-
 await loadProducts();
 
 updateStats();
 
 renderProducts();
+
+
+setTimeout(
+resetProductForm,
+800
+);
 
 
 button.disabled = false;
@@ -1902,48 +1873,40 @@ document
 .value =
 product.id;
 
-
 document
 .getElementById("productName")
 .value =
 product.name || "";
-
 
 document
 .getElementById("productSlug")
 .value =
 product.slug || "";
 
-
 document
 .getElementById("productPrice")
 .value =
 product.price || "";
-
 
 document
 .getElementById("productStock")
 .value =
 product.stock || 0;
 
-
 document
 .getElementById("productCategory")
 .value =
 product.category || "General";
-
 
 document
 .getElementById("productStatus")
 .value =
 product.status || "active";
 
-
 document
 .getElementById("productDescription")
 .value =
 product.description || "";
-
 
 document
 .getElementById("productFormTitle")
@@ -1951,19 +1914,29 @@ document
 "Edit Product";
 
 
-if(product.image_url){
+const previewBox =
+document.getElementById(
+"imagePreviewBox"
+);
 
-const preview =
-document
-.getElementById("imagePreview");
+previewBox.innerHTML = "";
 
-preview.src =
-product.image_url;
+const images =
+getProductImages(product);
 
-preview.style.display =
-"block";
+images.forEach(image=>{
 
-}
+const img =
+document.createElement("img");
+
+img.src = image;
+
+img.className =
+"preview-image";
+
+previewBox.appendChild(img);
+
+});
 
 
 showPageByName("addProduct");
@@ -1984,27 +1957,27 @@ document
 .getElementById("productForm")
 .reset();
 
-
 document
 .getElementById("editProductId")
 .value = "";
-
 
 document
 .getElementById("productFormTitle")
 .textContent =
 "Add New Product";
 
-
 document
-.getElementById("imagePreview")
-.style.display =
-"none";
+.getElementById("imagePreviewBox")
+.innerHTML = "";
 
 document
 .getElementById("productMessage")
 .className =
 "message";
+
+document
+.getElementById("productMessage")
+.textContent = "";
 
 }
 
@@ -2012,38 +1985,45 @@ document
 /* IMAGE PREVIEW */
 
 document
-.getElementById("productImage")
+.getElementById("productImages")
 .addEventListener(
 "change",
 function(){
 
-const file =
-this.files[0];
+const box =
+document.getElementById(
+"imagePreviewBox"
+);
 
-if(!file) return;
+box.innerHTML = "";
 
+const files =
+Array.from(this.files);
+
+files.forEach(file=>{
 
 const reader =
 new FileReader();
 
-
 reader.onload =
 function(e){
 
-const preview =
-document
-.getElementById("imagePreview");
+const img =
+document.createElement("img");
 
-preview.src =
+img.src =
 e.target.result;
 
-preview.style.display =
-"block";
+img.className =
+"preview-image";
+
+box.appendChild(img);
 
 };
 
-
 reader.readAsDataURL(file);
+
+});
 
 }
 );
@@ -2058,9 +2038,7 @@ products.find(
 p => String(p.id) === String(id)
 );
 
-
 if(!product) return;
-
 
 const confirmed =
 confirm(
@@ -2069,16 +2047,13 @@ product.name +
 '" permanently?'
 );
 
-
 if(!confirmed) return;
-
 
 const {error} =
 await db
 .from("products")
 .delete()
 .eq("id",id);
-
 
 if(error){
 
@@ -2091,14 +2066,15 @@ return;
 
 }
 
-
 await loadProducts();
 
 updateStats();
 
 renderProducts();
 
-alert("Product deleted successfully.");
+alert(
+"Product deleted successfully."
+);
 
 }
 
@@ -2112,7 +2088,6 @@ document.getElementById("ordersTable");
 
 if(!box) return;
 
-
 const search =
 (
 document
@@ -2120,7 +2095,6 @@ document
 ?.value || ""
 )
 .toLowerCase();
-
 
 const filtered =
 orders.filter(order=>{
@@ -2141,7 +2115,6 @@ const product =
 (order.products?.name || "")
 .toLowerCase();
 
-
 return (
 customer.includes(search) ||
 phone.includes(search) ||
@@ -2151,7 +2124,6 @@ product.includes(search)
 
 });
 
-
 if(filtered.length === 0){
 
 box.innerHTML =
@@ -2160,7 +2132,6 @@ box.innerHTML =
 return;
 
 }
-
 
 let html = `
 
@@ -2185,37 +2156,29 @@ let html = `
 <tbody>
 `;
 
-
 filtered.forEach(order=>{
 
 const product =
 order.products || {};
 
-
 const price =
 Number(product.price || 0);
-
 
 const quantity =
 Number(order.quantity || 1);
 
-
 const total =
 price * quantity;
-
 
 html += `
 
 <tr>
 
 <td>
-
 <strong>
 #${order.id}
 </strong>
-
 </td>
-
 
 <td>
 
@@ -2232,7 +2195,6 @@ Rs. ${formatPrice(price)}
 </span>
 
 </td>
-
 
 <td>
 
@@ -2265,18 +2227,15 @@ escapeHtml(order.note)
 
 </td>
 
-
 <td>
 ${quantity}
 </td>
-
 
 <td>
 <strong>
 Rs. ${formatPrice(total)}
 </strong>
 </td>
-
 
 <td>
 
@@ -2299,7 +2258,6 @@ ${statusOption("cancelled",order.status)}
 
 </td>
 
-
 <td>
 ${formatDate(order.created_at)}
 </td>
@@ -2309,7 +2267,6 @@ ${formatDate(order.created_at)}
 `;
 
 });
-
 
 html += `
 </tbody>
@@ -2349,7 +2306,6 @@ status:status
 })
 .eq("id",id);
 
-
 if(error){
 
 alert(
@@ -2361,12 +2317,10 @@ return;
 
 }
 
-
 const order =
 orders.find(
 o => String(o.id) === String(id)
 );
-
 
 if(order){
 
@@ -2375,8 +2329,9 @@ status;
 
 }
 
-
 updateStats();
+
+renderOrders();
 
 renderRecentOrders();
 
@@ -2392,10 +2347,8 @@ document.getElementById("recentOrders");
 
 if(!box) return;
 
-
 const recent =
 orders.slice(0,5);
-
 
 if(recent.length === 0){
 
@@ -2405,7 +2358,6 @@ box.innerHTML =
 return;
 
 }
-
 
 let html = `
 
@@ -2428,7 +2380,6 @@ let html = `
 <tbody>
 `;
 
-
 recent.forEach(order=>{
 
 html += `
@@ -2440,6 +2391,7 @@ html += `
 </td>
 
 <td>
+
 <strong>
 ${escapeHtml(
 order.customer_name
@@ -2451,6 +2403,7 @@ order.customer_name
 <small>
 ${escapeHtml(order.phone)}
 </small>
+
 </td>
 
 <td>
@@ -2479,7 +2432,6 @@ order.status || "pending"
 `;
 
 });
-
 
 html += `
 </tbody>
