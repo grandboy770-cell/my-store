@@ -796,6 +796,7 @@ id="editProductId"
 type="text"
 id="productName"
 placeholder="Example: Black Watch"
+oninput="autoGenerateSlug()"
 required
 >
 
@@ -1062,6 +1063,16 @@ SUPABASE_KEY
 let products = [];
 let orders = [];
 
+
+/* AUTO SLUG GENERATOR */
+function autoGenerateSlug() {
+  const nameInput = document.getElementById("productName").value.trim();
+  const slugInput = document.getElementById("productSlug");
+  if(!document.getElementById("editProductId").value) {
+    const baseSlug = nameInput.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    slugInput.value = baseSlug ? `${baseSlug}-${Math.floor(100 + Math.random() * 900)}` : "";
+  }
+}
 
 /* LOGIN */
 
@@ -1594,7 +1605,7 @@ document
 .getElementById("productName")
 .value.trim();
 
-const slug =
+let slug =
 document
 .getElementById("productSlug")
 .value.trim()
